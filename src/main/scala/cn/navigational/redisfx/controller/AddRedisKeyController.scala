@@ -82,7 +82,10 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
       client.setEx(keyVal, value, database, ttl)
     } else {
       val hValue = hashValue.getText()
-      client.hSet(keyVal, value, hValue, database)
+      val attr = new util.HashMap[String, String]() {
+        this.put(value, hValue)
+      }
+      client.hSet(keyVal, attr, database)
     }
     future onComplete {
       case Success(value) => promise.success(value)

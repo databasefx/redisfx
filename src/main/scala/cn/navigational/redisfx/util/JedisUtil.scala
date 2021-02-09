@@ -41,6 +41,10 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
     this.executeCommand[Boolean](jedis => jedis.hset(key, field, value) > 0, database)
   }
 
+  def hSet(key: String, attr: java.util.Map[String, String], database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.hset(key, attr) > 0, database)
+  }
+
   def del(key: String, database: Int): Future[Long] = {
     this.executeCommand[Long](jedis => jedis.del(key), database)
   }
