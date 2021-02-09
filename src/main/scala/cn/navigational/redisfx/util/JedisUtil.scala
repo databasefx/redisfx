@@ -1,5 +1,6 @@
 package cn.navigational.redisfx.util
 
+import cn.navigational.redisfx.enums.RedisReplyStatus
 import cn.navigational.redisfx.model.RedisConnectInfo
 import redis.clients.jedis.{Jedis, JedisPool}
 
@@ -23,6 +24,21 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
 
   def get(key: String, database: Int): Future[String] = {
     this.executeCommand[String](jedis => jedis.get(key), database)
+  }
+
+  def setEx(key: String, value: String, database: Int, ttl: Int = -1): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => {
+      val status = if (ttl < 0) {
+        jedis.set(key, value)
+      } else {
+        jedis.setex(key, ttl, value)
+      }
+      status.equals(RedisReplyStatus.OK.toString)
+    }, database)
+  }
+
+  def hSet(key: String, field: String, value: String, database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.hset(key, field, value) > 0, database)
   }
 
   def del(key: String, database: Int): Future[Long] = {

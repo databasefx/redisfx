@@ -129,8 +129,8 @@ object RedisDataUtil {
    * @return
    */
   private def _json(str: String): RedisDataType = {
-    //    try {
-    //      val json = FJSON.parse(str)
+//    try {
+    //      val json = JSONUtil.objToJson(str)
     //      json match {
     //        case _: JSONObject =>
     //          JSON

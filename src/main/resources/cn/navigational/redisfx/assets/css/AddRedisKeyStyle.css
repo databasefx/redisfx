@@ -5,6 +5,14 @@
     -fx-vgap: 0.5em;
 }
 
+.content-box {
+    -fx-spacing: 1em;
+}
+
+.content-box .text-area {
+    -fx-pref-height: 7em;
+}
+
 .bottom-box {
     -fx-alignment: CENTER-RIGHT;
     -fx-spacing: 0.5em;

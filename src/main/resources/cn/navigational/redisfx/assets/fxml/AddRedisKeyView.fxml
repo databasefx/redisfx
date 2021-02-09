@@ -7,19 +7,26 @@
 <?import javafx.scene.layout.*?>
 
 <?import java.net.URL?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
-          prefHeight="400.0" prefWidth="600.0" styleClass="grid-pane">
+          prefHeight="600.0" prefWidth="700.0" styleClass="grid-pane">
     <stylesheets>
         <URL value="@../css/AddRedisKeyStyle.css"/>
     </stylesheets>
-    <Label text="Key:"/>
-    <TextField GridPane.rowIndex="1"/>
-    <Label text="Type:" GridPane.rowIndex="2"/>
-    <ChoiceBox GridPane.rowIndex="3" fx:id="typeChoiceBox"/>
-    <Label text="Value:" GridPane.rowIndex="4"/>
-    <TextArea GridPane.rowIndex="5"/>
-    <HBox GridPane.rowIndex="6" styleClass="bottom-box">
+    <Label text="类型:"/>
+    <ChoiceBox GridPane.rowIndex="1" fx:id="typeChoiceBox"/>
+    <Label text="数据库:" GridPane.rowIndex="2"/>
+    <ChoiceBox GridPane.rowIndex="3" fx:id="dbBox"/>
+    <Label text="键:" GridPane.rowIndex="4"/>
+    <TextField GridPane.rowIndex="5" fx:id="keyField"/>
+    <Label text="过期时间(秒):" GridPane.rowIndex="6"/>
+    <TextField fx:id="ttlField" text="-1" GridPane.rowIndex="7" HBox.hgrow="ALWAYS"/>
+    <Label text="值:" GridPane.rowIndex="8"/>
+    <VBox GridPane.rowIndex="9" styleClass="content-box" fx:id="contentBox">
+        <TextArea fx:id="regularField"/>
+    </VBox>
+    <HBox GridPane.rowIndex="10" styleClass="bottom-box">
         <Button text="保存" onAction="#createRedisKey"/>
         <Button text="取消"/>
     </HBox>
