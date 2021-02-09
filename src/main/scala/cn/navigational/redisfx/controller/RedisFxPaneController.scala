@@ -10,16 +10,16 @@ import cn.navigational.redisfx.util.JedisUtil
 import javafx.application.Platform
 import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
-import javafx.scene.control.{ButtonType, Tab, TabPane}
+import javafx.scene.control.{Tab, TabPane}
 import javafx.scene.layout.BorderPane
 import javafx.stage.WindowEvent
 
-import scala.jdk.CollectionConverters._
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.{Await, Future, Promise}
-import scala.util.control.Breaks.break
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+import scala.jdk.CollectionConverters._
+import scala.util.control.Breaks.break
 import scala.util.{Failure, Success}
 
 
