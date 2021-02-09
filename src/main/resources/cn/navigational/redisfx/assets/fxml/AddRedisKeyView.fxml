@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          prefHeight="400.0" prefWidth="600.0" styleClass="grid-pane">
+    <stylesheets>
+        <URL value="@../css/AddRedisKeyStyle.css"/>
+    </stylesheets>
+    <Label text="Key:"/>
+    <TextField GridPane.rowIndex="1"/>
+    <Label text="Type:" GridPane.rowIndex="2"/>
+    <ChoiceBox GridPane.rowIndex="3" fx:id="typeChoiceBox"/>
+    <Label text="Value:" GridPane.rowIndex="4"/>
+    <TextArea GridPane.rowIndex="5"/>
+    <HBox GridPane.rowIndex="6" styleClass="bottom-box">
+        <Button text="保存" onAction="#createRedisKey"/>
+        <Button text="取消"/>
+    </HBox>
+</GridPane>

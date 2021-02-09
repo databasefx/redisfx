@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            visible="false"
+            prefHeight="400.0" prefWidth="600.0" styleClass="mask-pane">
+    <stylesheets>
+        <URL value="@../../css/ViewMaskPaneStyle.css"/>
+    </stylesheets>
+    <top>
+        <VBox styleClass="top-box">
+            <Button fx:id="closeBtn" onAction="#hidden">
+                <tooltip>
+                    <Tooltip text="关闭"/>
+                </tooltip>
+                <graphic>
+                    <ImageView>
+                        <Image url="@../../icon/mask/close.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </VBox>
+    </top>
+</BorderPane>

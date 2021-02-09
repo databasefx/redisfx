@@ -1,0 +1,5 @@
+.tool-bar {
+    -fx-padding: 0.5em;
+    -fx-spacing: 0.5em;
+    -fx-alignment: CENTER;
+}

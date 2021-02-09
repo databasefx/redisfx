@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            prefHeight="400.0" prefWidth="600.0">
+    <stylesheets>
+        <URL value="@../../css/RedisValTabPaneStyle.css"/>
+    </stylesheets>
+    <top>
+        <VBox alignment="center" styleClass="tool-bar">
+            <HBox>
+                <TextField HBox.hgrow="ALWAYS" fx:id="keyTextF" editable="false"/>
+                <ToolBar>
+                    <Label fx:id="tLabel"/>
+                    <Button text="重命名" onAction="#renameKey"/>
+                    <Button text="删除" onAction="#deleteKey"/>
+                    <Button text="重新加载" onAction="#initVal"/>
+                    <Button text="设置TTL" onAction="#updateTTL"/>
+                </ToolBar>
+            </HBox>
+            <HBox>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="10">
+                    <Label text="数据大小:"/>
+                    <Label fx:id="dataSize"/>
+                </HBox>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="10">
+                    <Label text="数据格式:"/>
+                    <ChoiceBox fx:id="dataFormat"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <TextArea fx:id="textArea" editable="false" wrapText="true"/>
+    </center>
+</BorderPane>

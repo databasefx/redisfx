@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.controlsfx.control.ToggleSwitch?>
+<?import java.net.URL?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          alignment="CENTER" styleClass="grid-pane">
+    <stylesheets>
+        <URL value="@../css/RedisConnectViewStyle.css"/>
+    </stylesheets>
+    <Label text="名称:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <TextField GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" fx:id="name"/>
+    <Label text="主机:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" text="127.0.0.1" GridPane.hgrow="ALWAYS" fx:id="host"/>
+    <Label text="端口:" GridPane.rowIndex="2"/>
+    <TextField GridPane.rowIndex="2" GridPane.columnIndex="1" text="6379" fx:id="port"/>
+    <Label text="密码:" GridPane.rowIndex="3"/>
+    <PasswordField GridPane.rowIndex="3" GridPane.columnIndex="1" fx:id="password"/>
+    <Label text="本地保存:" GridPane.rowIndex="4"/>
+    <ToggleSwitch GridPane.rowIndex="4" GridPane.columnIndex="1" fx:id="saveLocal"/>
+    <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="5" spacing="10" GridPane.columnSpan="2">
+        <Button text="测试连接" onAction="#pingRedis"/>
+        <Button text="保存" onAction="#toSave"/>
+    </HBox>
+</GridPane>

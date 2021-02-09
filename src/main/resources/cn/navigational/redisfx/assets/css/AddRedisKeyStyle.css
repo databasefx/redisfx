@@ -1,0 +1,11 @@
+.grid-pane {
+    -fx-alignment: CENTER;
+    -fx-padding: 0.5em;
+    -fx-hgap: 0.5em;
+    -fx-vgap: 0.5em;
+}
+
+.bottom-box {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-spacing: 0.5em;
+}

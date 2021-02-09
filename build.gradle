@@ -1,0 +1,96 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+    id 'scala'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'com.gluonhq.client-gradle-plugin' version '0.1.36'
+}
+
+group 'cn.navigational'
+version '1.0-SNAPSHOT'
+
+mainClassName = 'cn.navigational.redisfx.Launcher'
+
+//jvm args
+applicationDefaultJvmArgs = ['-Dsun.java2d.opengl=true', '-XX:+UseZGC', '-Xms512M', '-Xmx1024M']
+if (javafx.platform.classifier == 'linux') applicationDefaultJvmArgs.add("-Djdk.gtk.version=2")
+
+javafx {
+    version = "15.0.1"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.graphics']
+}
+
+gluonClient {
+    graalvmHome = '/home/yangkui/application/graalvm'
+}
+sourceSets {
+    main {
+        scala {
+            srcDirs = ['src/main/scala', 'src/main/java']
+        }
+        java {
+            srcDirs = []
+        }
+    }
+    test {
+        scala {
+            srcDirs = ['src/test/scala', 'src/test/java']
+        }
+        java {
+            srcDirs = []
+        }
+    }
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect {
+            if (!it.name.startsWith("javafx")) {
+                zipTree(it)
+            }
+        }
+    }
+    archiveFileName = "redisfx.jar"
+    manifest {
+        attributes 'Multi-Release': true
+        attributes 'Main-Class': mainClassName
+        attributes 'App-Name': rootProject.name
+        attributes "App-Version": project.version
+        attributes 'App-Author': '752544765@qq.com'
+        attributes 'App-Website': 'http://navigational.cn'
+        attributes 'Build-Time': new SimpleDateFormat().format(new Date())
+        attributes 'Copyright': 'Copyright © 2019-2020 navigational.cn'
+    }
+}
+
+repositories {
+    maven {
+        url "https://maven.aliyun.com/repository/google"
+    }
+    maven {
+        url "https://maven.aliyun.com/nexus/content/repositories/central"
+    }
+    maven {
+        url "https://maven.aliyun.com/nexus/content/groups/public/"
+    }
+    maven {
+        url "https://nexus.gluonhq.com/nexus/content/repositories/releases"
+    }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    jcenter()
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation 'dom4j:dom4j:1.6.1'
+    implementation 'redis.clients:jedis:3.4.1'
+    implementation 'org.scala-lang:scala-library:2.13.1'
+    implementation 'org.controlsfx:controlsfx:11.0.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
+}

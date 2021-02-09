@@ -1,0 +1,45 @@
+.top-box HBox {
+    -fx-padding: 0.25em;
+}
+
+.top-box, .top-box HBox {
+    -fx-pref-height: 3.5em;
+}
+
+.top-box, .bottom-box {
+    -fx-background-color: #EEEE;
+}
+
+.top-box .button {
+    -fx-padding: 0.5em;
+    -fx-border-width: 0.05em;
+    -fx-border-color: #EEEE;
+    -fx-background-color: none;
+}
+
+.top-box .button:hover {
+    -fx-background-color: white;
+    -fx-border-color: #315BEF;
+}
+
+.top-box .left-box {
+    -fx-spacing: 0.1em;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.top-box .center-box {
+    -fx-alignment: CENTER;
+}
+
+.top-box .right-box {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-spacing: 0.1em;
+}
+
+.table-view {
+    -fx-background-insets: 0;
+}
+
+.table-view .table-cell {
+    -fx-alignment: CENTER;
+}

@@ -1,0 +1,15 @@
+.navigator-view, .text-area {
+    -fx-background-insets: 0;
+}
+
+.tab-pane .tab {
+    -fx-pref-height: 3em;
+}
+
+.redis-terminal, redis-terminal * {
+    -fx-background-color: #000000;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #F6F7F8;
+}

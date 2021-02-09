@@ -1,0 +1,67 @@
+.mask-pane {
+    -fx-padding: 0.5em;
+}
+
+.mask-pane * {
+    -fx-text-fill: #fff;
+}
+
+.top-box {
+    -fx-alignment: CENTER-RIGHT;
+}
+
+.top-box .button {
+    -fx-background-color: transparent;
+}
+
+.mask-pane-model, .mask-load-pane VBox {
+    -fx-background-color: rgba(0, 0, 0, .8);
+}
+
+.mask-pane-model .mask-load-pane VBox {
+    -fx-background-color: transparent;
+}
+
+.mask-load-pane, .mask-load-pane * {
+    -fx-alignment: CENTER;
+}
+
+.mask-load-pane VBox {
+    -fx-padding: 2em;
+    -fx-spacing: 0.5em;
+    -fx-alignment: CENTER;
+    -fx-background-radius: 1em;
+}
+
+.mask-error-pane {
+    -fx-spacing: 0.5em;
+}
+
+.mask-error-pane HBox {
+    -fx-spacing: 0.5em;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.mask-error-pane .text-area {
+    -fx-border-color: red;
+    -fx-border-width: 0.1em;
+    -fx-border-radius: 0.5em;
+    -fx-background-color: transparent;
+}
+
+.mask-error-pane .text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.mask-error-pane .text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+
+.mask-error-pane .text-area .scroll-pane .content {
+    -fx-background-color: transparent;
+}
+
+.mask-error-pane HBox {
+    -fx-padding: 0.8em 0 !important;
+}

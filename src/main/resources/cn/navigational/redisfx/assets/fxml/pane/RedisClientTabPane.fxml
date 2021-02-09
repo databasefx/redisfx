@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import java.net.URL?>
+<?import javafx.scene.layout.VBox?>
+<TabPane xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml" side="LEFT">
+    <stylesheets>
+        <URL value="@../../css/RedisClientTabPane.css"/>
+    </stylesheets>
+    <Tab closable="false">
+        <graphic>
+            <ImageView>
+                <Image url="@../../icon/icon.png"/>
+            </ImageView>
+        </graphic>
+        <SplitPane dividerPositions="0.1">
+            <VBox>
+                <ToolBar>
+                    <Button onAction="#refresh" styleClass="btn-default">
+                        <tooltip>
+                            <Tooltip text="刷新"/>
+                        </tooltip>
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../../icon/tool-bar/flush.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button styleClass="btn-default" onAction="#addRedisKey">
+                        <tooltip>
+                            <Tooltip text="添加"/>
+                        </tooltip>
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../../icon/tool-bar/add.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button onAction="#deleteKey" styleClass="btn-default">
+                        <tooltip>
+                            <Tooltip text="删除"/>
+                        </tooltip>
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../../icon/tool-bar/delete.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </ToolBar>
+                <TreeView fx:id="treeView" styleClass="navigator-view" VBox.vgrow="ALWAYS" showRoot="false">
+                    <TreeItem/>
+                </TreeView>
+            </VBox>
+
+            <TabPane fx:id="tabPane">
+
+            </TabPane>
+        </SplitPane>
+    </Tab>
+    <Tab closable="false">
+        <graphic>
+            <ImageView>
+                <Image url="@../../icon/terminal.png"/>
+            </ImageView>
+        </graphic>
+        <content>
+            <TextArea styleClass="redis-terminal"/>
+        </content>
+    </Tab>
+    <Tab closable="false">
+        <graphic>
+            <ImageView>
+                <Image url="@../../icon/redis-sys.png"/>
+            </ImageView>
+        </graphic>
+    </Tab>
+</TabPane>
