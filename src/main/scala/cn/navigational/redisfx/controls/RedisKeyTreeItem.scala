@@ -9,7 +9,8 @@ import javafx.scene.image.{Image, ImageView}
 
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future, Promise}
 
 
 object RedisKeyTreeItem {
@@ -51,16 +52,10 @@ class RedisKeyTreeItem(private val redisKey: RedisKey) extends RedisFxTreeItem {
     if (!confirm) {
       return Future.successful(false)
     }
-    val promise = Promise[Boolean]()
-    val client = RedisFxPaneController.getRedisClient(uuid)
-    val future = client.del(getRowKey, index)
-    future onComplete {
-      case Success(value) => promise.success(value > 0)
-      case Failure(ex) =>
-        ex.printStackTrace()
-        promise.success(false)
-    }
-    promise.future
+    this._refresh[Boolean](() => {
+      val client = RedisFxPaneController.getRedisClient(uuid)
+      Await.result[Long](client.del(getRowKey, index), Duration.Inf) > 0
+    })
   }
 
   /**

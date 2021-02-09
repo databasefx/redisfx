@@ -1,0 +1,19 @@
+name: Sync to gitee.com
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actionhub/workflows/git-sync@v1
+        name: Sync repo to gitee
+        with:
+          ssh-key: ${{ secrets.GITEE_AUTO_SYN }}
+          repo-url: git@gitee.com:databasefx/redisfx.git
+          force: true
