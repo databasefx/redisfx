@@ -1,48 +1,15 @@
 package cn.navigational.redisfx.util
 
 import cn.navigational.redisfx.model.RedisKey
-import cn.navigational.redisfx.util.RedisDataType.{JSON, RedisDataType, TEXT, UN_KNOWN, XML}
-import org.dom4j.DocumentHelper
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
-
-object RedisDataType extends Enumeration {
-  type RedisDataType = Value
-  val TEXT, XML, JSON, UN_KNOWN = Value
-
-  def getDataType(str: String): RedisDataType = {
-    if (str.equals(TEXT.toString)) {
-      TEXT
-    } else if (str.equals(XML.toString)) {
-      XML
-    } else if (str.equals(JSON.toString)) {
-      JSON
-    } else {
-      UN_KNOWN
-    }
-  }
-}
-
 object RedisDataUtil {
 
   val FILE_SEPARATOR = ":"
 
-  def getRedisValType(str: String): RedisDataType = {
-    //判断是否json
-    val json = _json(str)
-    if (json != RedisDataType.UN_KNOWN) {
-      return json
-    }
-    //判断是否xml
-    val xml = _xml(str)
-    if (xml != RedisDataType.UN_KNOWN) {
-      return xml
-    }
-    TEXT
-  }
 
   /**
    * 将Redis key生成树形结构
@@ -76,27 +43,6 @@ object RedisDataUtil {
   }
 
   /**
-   * 格式化字符串
-   *
-   * @param str      待格式化字符串
-   * @param dataType 数据类型
-   * @return
-   */
-  def formatVal(str: String, dataType: RedisDataType): String = {
-    try {
-      dataType match {
-        case JSON =>
-          JSONUtil.formatJsonStr(str)
-        case XML =>
-          DocumentHelper.parseText(str).asXML()
-        case _ => str
-      }
-    } catch {
-      case ex: Exception => str
-    }
-  }
-
-  /**
    * 映射redis key文件结构
    *
    * @param key redis key
@@ -120,43 +66,5 @@ object RedisDataUtil {
       option.get
     }
     this.mapRedisKey(leftStr, di, rk)
-  }
-
-  /**
-   * 判断给定字符串是否json数据
-   *
-   * @param str 待解析数据
-   * @return
-   */
-  private def _json(str: String): RedisDataType = {
-//    try {
-    //      val json = JSONUtil.objToJson(str)
-    //      json match {
-    //        case _: JSONObject =>
-    //          JSON
-    //        case _: JSONArray =>
-    //          JSON_ARRAY
-    //        case _ =>
-    //          UN_KNOWN
-    //      }
-    //    } catch {
-    //      case ex: Exception => UN_KNOWN
-    //    }
-    UN_KNOWN
-  }
-
-  /**
-   * 判断给定数据是否xml
-   *
-   * @param str 待解析数据
-   * @return
-   */
-  private def _xml(str: String): RedisDataType = {
-    try {
-      DocumentHelper.parseText(str)
-      XML
-    } catch {
-      case ex: Exception => UN_KNOWN
-    }
   }
 }

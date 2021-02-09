@@ -4,8 +4,8 @@ import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
+import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.helper.NotificationHelper
-import cn.navigational.redisfx.util.{RedisDataType, RedisDataUtil}
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
@@ -36,11 +36,6 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   {
     initVal()
     dataFormat.getItems.addAll("TEXT", "JSON", "XML")
-    dataFormat.getSelectionModel.selectedItemProperty().addListener((_, _, item) => {
-      val dataType = RedisDataType.getDataType(item)
-      val format = RedisDataUtil.formatVal(value, dataType)
-      this.textArea.setText(format)
-    })
   }
 
   @FXML
@@ -106,7 +101,11 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
       val ttl = Await.result[Long](client.ttl(valTab.redisKey, valTab.index), Duration.Inf)
-      val text = Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
+      val dataType = Await.result[RedisDataType](client.typeKey(valTab.redisKey, valTab.index), Duration.Inf)
+      val text = dataType match {
+        case RedisDataType.HASH => Await.result[String](client.hGet(valTab.redisKey, valTab.index), Duration.Inf)
+        case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
+      }
       this.updateText(text, ttl)
       promise.success()
     } catch {

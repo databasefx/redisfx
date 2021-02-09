@@ -1,6 +1,6 @@
 package cn.navigational.redisfx.util
 
-import cn.navigational.redisfx.enums.RedisReplyStatus
+import cn.navigational.redisfx.enums.{RedisDataType, RedisReplyStatus}
 import cn.navigational.redisfx.model.RedisConnectInfo
 import redis.clients.jedis.{Jedis, JedisPool}
 
@@ -24,6 +24,10 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
 
   def get(key: String, database: Int): Future[String] = {
     this.executeCommand[String](jedis => jedis.get(key), database)
+  }
+
+  def hGet(key: String, database: Int): Future[String] = {
+    this.executeCommand[String](jedis => JSONUtil.objToJson(jedis.hgetAll(key)), database)
   }
 
   def setEx(key: String, value: String, database: Int, ttl: Int = -1): Future[Boolean] = {
@@ -61,8 +65,8 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
     this.executeCommand[String](jedis => jedis.rename(oldKey, newKey), database)
   }
 
-  def typeKey(key: String, database: Int): Future[String] = {
-    this.executeCommand[String](jedis => jedis.`type`(key), database)
+  def typeKey(key: String, database: Int): Future[RedisDataType] = {
+    this.executeCommand[RedisDataType](jedis => RedisDataType.getDataType(jedis.`type`(key)), database)
   }
 
   /**
