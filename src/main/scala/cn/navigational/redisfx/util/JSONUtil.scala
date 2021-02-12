@@ -1,6 +1,7 @@
 package cn.navigational.redisfx.util
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.{FormatFeature, JsonParseException, JsonProcessingException}
+import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 
 /**
  *
@@ -54,6 +55,25 @@ object JSONUtil {
    */
   def formatJsonStr(str: String): String = {
     val node = objectMapper.readTree(str)
-    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node)
+    val objWriter = objectMapper.writerWithDefaultPrettyPrinter()
+    objWriter.writeValueAsString(node)
   }
+
+  /**
+   * 判断一个字符串是否json数据
+   *
+   * @param json json字符串
+   * @return 返回判断结果
+   */
+  def validJSON(json: String): Boolean = {
+    var valid: Boolean = false
+    try {
+      objectMapper.readTree(json)
+      valid = true
+    } catch {
+      case ex: JsonProcessingException =>
+    }
+    valid
+  }
+
 }

@@ -1,5 +1,6 @@
 package cn.navigational.redisfx.util
 
+import cn.navigational.redisfx.enums.RedisDataViewFormat
 import cn.navigational.redisfx.model.RedisKey
 
 import scala.annotation.tailrec
@@ -10,6 +11,36 @@ object RedisDataUtil {
 
   val FILE_SEPARATOR = ":"
 
+  /**
+   * 获取给定字符串类型
+   *
+   * @param str 目标字符串
+   */
+  def getRedisDataViewFormat(str: String): RedisDataViewFormat = {
+    if (JSONUtil.validJSON(str)) {
+      RedisDataViewFormat.JSON
+    } else if (XMLUtil.validXML(str)) {
+      RedisDataViewFormat.XML
+    } else {
+      RedisDataViewFormat.PLAINT_TEXT
+    }
+  }
+
+  /**
+   * 根据给定的视图格式化文本信息
+   *
+   * @param str        目标字符串
+   * @param viewFormat 数据格式
+   * @return
+   */
+  def formatViewData(str: String, viewFormat: RedisDataViewFormat): String = {
+    viewFormat match {
+      case RedisDataViewFormat.XML => XMLUtil.formatXML(str)
+      case RedisDataViewFormat.HEX => StringUtil.toBinary(str)
+      case RedisDataViewFormat.JSON => JSONUtil.formatJsonStr(str)
+      case _ => str
+    }
+  }
 
   /**
    * 将Redis key生成树形结构

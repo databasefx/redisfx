@@ -4,8 +4,9 @@ import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
-import cn.navigational.redisfx.enums.RedisDataType
+import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
 import cn.navigational.redisfx.helper.NotificationHelper
+import cn.navigational.redisfx.util.RedisDataUtil
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
@@ -30,12 +31,12 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   @FXML
   private var dataFormat: ChoiceBox[String] = _
 
-  private var value: String = _
-
-
   {
     initVal()
-    dataFormat.getItems.addAll("TEXT", "JSON", "XML")
+    for (item <- RedisDataViewFormat.values()) {
+      dataFormat.getItems.add(item.getName)
+    }
+    dataFormat.getSelectionModel.select(RedisDataViewFormat.PLAINT_TEXT.getName)
   }
 
   @FXML
@@ -79,15 +80,22 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     })
   }
 
-  private def updateText(text: String, ttl: Long): Unit = {
-    this.value = text
+  private def updateText(text: String, ttl: Long, viewFormat: RedisDataViewFormat = null): Unit = {
     val size = text.getBytes(Charset.forName("UTF8")).length
+    var formatVal = text
+    var tempFormat = viewFormat
+    //如果未指定数据格式=>自动判断
+    if (viewFormat == null) {
+      tempFormat = RedisDataUtil.getRedisDataViewFormat(text)
+    }
+    formatVal = RedisDataUtil.formatViewData(text, tempFormat)
+
     Platform.runLater(() => {
-      this.textArea.setText(text)
+      this.textArea.setText(formatVal)
       this.dataSize.setText(s"$size 字节")
       this.tLabel.setText(s"TTL:$ttl")
       this.keyTextF.setText(valTab.redisKey)
-      dataFormat.getSelectionModel.select(0)
+      dataFormat.getSelectionModel.select(tempFormat.getName)
     })
   }
 
