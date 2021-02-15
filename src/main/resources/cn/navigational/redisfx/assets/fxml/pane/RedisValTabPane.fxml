@@ -21,7 +21,7 @@
                     <Label fx:id="tLabel"/>
                     <Button text="重命名" onAction="#renameKey"/>
                     <Button text="删除" onAction="#deleteKey"/>
-                    <Button text="重新加载" onAction="#initVal"/>
+                    <Button text="重新加载" onAction="#reloadVal"/>
                     <Button text="设置TTL" onAction="#updateTTL"/>
                 </ToolBar>
             </HBox>

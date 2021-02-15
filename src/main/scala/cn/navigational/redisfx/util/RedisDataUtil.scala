@@ -34,11 +34,15 @@ object RedisDataUtil {
    * @return
    */
   def formatViewData(str: String, viewFormat: RedisDataViewFormat): String = {
-    viewFormat match {
-      case RedisDataViewFormat.XML => XMLUtil.formatXML(str)
-      case RedisDataViewFormat.HEX => StringUtil.toBinary(str)
-      case RedisDataViewFormat.JSON => JSONUtil.formatJsonStr(str)
-      case _ => str
+    try {
+      viewFormat match {
+        case RedisDataViewFormat.XML => XMLUtil.formatXML(str)
+        case RedisDataViewFormat.HEX => StringUtil.toBinary(str)
+        case RedisDataViewFormat.JSON => JSONUtil.formatJsonStr(str)
+        case _ => str
+      }
+    } catch {
+      case ex: Exception => str
     }
   }
 

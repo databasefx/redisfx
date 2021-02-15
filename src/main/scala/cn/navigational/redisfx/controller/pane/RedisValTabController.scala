@@ -8,6 +8,7 @@ import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
 import cn.navigational.redisfx.helper.NotificationHelper
 import cn.navigational.redisfx.util.RedisDataUtil
 import javafx.application.Platform
+import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
 import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
 import javafx.scene.layout.BorderPane
@@ -30,6 +31,9 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   private var keyTextF: TextField = _
   @FXML
   private var dataFormat: ChoiceBox[String] = _
+  private val viewDataTypeListener: ChangeListener[String] = (_, _, newVal) => {
+    this.initVal(RedisDataViewFormat.getViewFormat(newVal))
+  }
 
   {
     initVal()
@@ -37,6 +41,9 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
       dataFormat.getItems.add(item.getName)
     }
     dataFormat.getSelectionModel.select(RedisDataViewFormat.PLAINT_TEXT.getName)
+    dataFormat.getSelectionModel.selectedItemProperty().addListener(this.viewDataTypeListener)
+    //移出监听程序
+    this.valTab.setOnCloseRequest(_ => dataFormat.getSelectionModel.selectedItemProperty().removeListener(this.viewDataTypeListener))
   }
 
   @FXML
@@ -99,12 +106,16 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     })
   }
 
+  @FXML
+  def reloadVal(): Unit = {
+    this.initVal()
+  }
 
   /**
    * 加载value值
    *
    */
-  def initVal(): Future[Unit] = Future {
+  def initVal(viewFormat: RedisDataViewFormat = null): Future[Unit] = Future {
     val promise = showLoad[Unit]()
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
@@ -114,10 +125,11 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
         case RedisDataType.HASH => Await.result[String](client.hGet(valTab.redisKey, valTab.index), Duration.Inf)
         case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
       }
-      this.updateText(text, ttl)
+      this.updateText(text, ttl, viewFormat)
       promise.success()
     } catch {
       case ex: Exception => promise.failure(ex)
     }
   }
+
 }
