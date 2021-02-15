@@ -4,6 +4,7 @@ import cn.navigational.redisfx.enums.RedisDataViewFormat
 import cn.navigational.redisfx.model.RedisKey
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
@@ -75,6 +76,29 @@ object RedisDataUtil {
       }
     }
     keys.sortBy(it => it.sub.size).reverse.toArray
+  }
+
+  /**
+   * 简单格式化redis list数据格式
+   *
+   * @param list 数据列表
+   * @return
+   */
+  def formatListVal(list: Array[String]): String = {
+    val sb: mutable.StringBuilder = new StringBuilder("[\r\n")
+    var index: Int = 0
+    for (elem <- list) {
+      sb.append("  ")
+      sb.append(index)
+      sb.append("   ")
+      sb.append(" -> ")
+      sb.append("   ")
+      sb.append(elem)
+      sb.append("\r\n")
+      index += 1
+    }
+    sb.append("]")
+    sb.toString()
   }
 
   /**

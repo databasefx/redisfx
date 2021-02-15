@@ -71,7 +71,7 @@ object JSONUtil {
       objectMapper.readTree(json)
       valid = true
     } catch {
-      case ex: JsonProcessingException =>
+      case ex: Exception =>
     }
     valid
   }

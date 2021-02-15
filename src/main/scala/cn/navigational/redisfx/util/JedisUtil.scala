@@ -34,6 +34,84 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
     this.executeCommand[String](jedis => JSONUtil.objToJson(jedis.hgetAll(key)), database)
   }
 
+  /**
+   * 向redis数组追加元素
+   *
+   * @param key      arr name
+   * @param value    arr value
+   * @param database target database
+   * @return
+   */
+  def lPush(key: String, value: String, database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.lpush(key, value) >= 0, database)
+  }
+
+  /**
+   * 写入无序集合值
+   *
+   * @param key      集合key
+   * @param value    集合值
+   * @param database 目标数据库
+   * @return
+   */
+  def sAdd(key: String, value: String, database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.sadd(key, value) > 0, database)
+  }
+
+  /**
+   * 写入有序集合值
+   *
+   * @param scope 权重值
+   * @return
+   */
+  def zAdd(key: String, value: String, scope: Int, database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.zadd(key, scope, value) > 0, database)
+  }
+
+  def sMember(key: String, database: Int): Future[Array[String]] = {
+    this.executeCommand[Array[String]](jedis => jedis.smembers(key).asScala.toArray, database)
+  }
+
+  def zCard(key: String, database: Int): Future[Long] = {
+    this.executeCommand(jedis => jedis.zcard(key), database)
+  }
+
+  def zRange(key: String, start: Long, end: Long, database: Int): Future[Array[String]] = {
+    this.executeCommand[Array[String]](jedis => jedis.zrange(key, start, end).asScala.toArray, database)
+  }
+
+  /**
+   * 获取指定key数组长度
+   *
+   * @param key
+   * @param database
+   * @return
+   */
+  def lLen(key: String, database: Int): Future[Long] = {
+    this.executeCommand[Long](jedis => jedis.llen(key), database)
+  }
+
+  /**
+   * 获取redis数组元素
+   *
+   * @param key   目标key
+   * @param start 数组坐标起始位置
+   * @param end   数组结束位置
+   * @return 返回数组值列表
+   */
+  def lRange(key: String, start: Long, end: Long, database: Int): Future[Array[String]] = {
+    this.executeCommand(jedis => jedis.lrange(key, start, end).asScala.toArray, database)
+  }
+
+  /**
+   * 设置普通字符串值
+   *
+   * @param key      redis key
+   * @param value    redis value
+   * @param database target database
+   * @param ttl      expire time
+   * @return
+   */
   def setEx(key: String, value: String, database: Int, ttl: Int = -1): Future[Boolean] = {
     this.executeCommand[Boolean](jedis => {
       val status = if (ttl < 0) {

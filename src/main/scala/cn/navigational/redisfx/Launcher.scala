@@ -5,10 +5,10 @@ import cn.navigational.redisfx.controller.RedisMainViewController
 import javafx.application.{Application, Platform}
 import javafx.scene.text.Font
 import javafx.stage.Stage
+import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.IOException
 import java.util
-import java.util.logging.Level
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -21,6 +21,8 @@ object Launcher {
 
 
 class RedisFx extends Application with AppPlatform.AppNotificationHandler {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[RedisFx])
+
   override def init(): Unit = {
     Future {
       Font.loadFont(RedisFxResource.load("font/font1715.ttf").openStream(), 15d)
@@ -54,11 +56,10 @@ class RedisFx extends Application with AppPlatform.AppNotificationHandler {
     }
   }
 
-  import java.util.logging.Logger
 
   private class RedisFxUncaughtExceptionHandler extends Thread.UncaughtExceptionHandler {
     override def uncaughtException(t: Thread, e: Throwable): Unit = {
-      Logger.getLogger(this.getClass.getName).log(Level.SEVERE, "An exception was thrown:", e)
+      logger.error("Progress happen a un-catch exception.", e)
     }
   }
 

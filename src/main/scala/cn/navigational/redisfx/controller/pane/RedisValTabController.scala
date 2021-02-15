@@ -6,7 +6,7 @@ import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
 import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
 import cn.navigational.redisfx.helper.NotificationHelper
-import cn.navigational.redisfx.util.RedisDataUtil
+import cn.navigational.redisfx.util.{JSONUtil, RedisDataUtil}
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
@@ -123,6 +123,17 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
       val dataType = Await.result[RedisDataType](client.typeKey(valTab.redisKey, valTab.index), Duration.Inf)
       val text = dataType match {
         case RedisDataType.HASH => Await.result[String](client.hGet(valTab.redisKey, valTab.index), Duration.Inf)
+        case RedisDataType.LIST =>
+          val len = Await.result[Long](client.lLen(valTab.redisKey, valTab.index), Duration.Inf)
+          val list = Await.result[Array[String]](client.lRange(valTab.redisKey, 0, len, valTab.index), Duration.Inf)
+          RedisDataUtil.formatListVal(list)
+        case RedisDataType.SET =>
+          val arr = Await.result[Array[String]](client.sMember(valTab.redisKey, valTab.index), Duration.Inf)
+          JSONUtil.objToJson(arr)
+        case RedisDataType.Z_SET =>
+          val len = Await.result[Long](client.zCard(valTab.redisKey, valTab.index), Duration.Inf)
+          val arr = Await.result[Array[String]](client.zRange(valTab.redisKey, 0, len, valTab.index), Duration.Inf)
+          RedisDataUtil.formatListVal(arr)
         case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
       }
       this.updateText(text, ttl, viewFormat)

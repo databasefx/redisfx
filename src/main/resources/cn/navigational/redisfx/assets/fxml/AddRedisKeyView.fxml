@@ -22,11 +22,13 @@
     <TextField GridPane.rowIndex="5" fx:id="keyField"/>
     <Label text="过期时间(秒):" GridPane.rowIndex="6"/>
     <TextField fx:id="ttlField" text="-1" GridPane.rowIndex="7" HBox.hgrow="ALWAYS"/>
-    <Label text="值:" GridPane.rowIndex="8"/>
-    <VBox GridPane.rowIndex="9" styleClass="content-box" fx:id="contentBox">
+    <Label text="权重:" GridPane.rowIndex="8"/>
+    <TextField GridPane.rowIndex="9" disable="true" fx:id="scoreField" text="0"/>
+    <Label text="值:" GridPane.rowIndex="10"/>
+    <VBox GridPane.rowIndex="11" styleClass="content-box" fx:id="contentBox">
         <TextArea fx:id="regularField"/>
     </VBox>
-    <HBox GridPane.rowIndex="10" styleClass="bottom-box">
+    <HBox GridPane.rowIndex="12" styleClass="bottom-box">
         <Button text="保存" onAction="#createRedisKey"/>
         <Button text="取消"/>
     </HBox>

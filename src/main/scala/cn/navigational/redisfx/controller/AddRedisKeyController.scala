@@ -7,7 +7,7 @@ import cn.navigational.redisfx.enums.RedisDataType
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
-import javafx.scene.control.{ChoiceBox, TextArea, TextField}
+import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
 import javafx.scene.layout.{GridPane, VBox}
 import javafx.stage.WindowEvent
 
@@ -30,6 +30,8 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
   @FXML
   private var ttlField: TextField = _
   @FXML
+  private var scoreField: TextField = _
+  @FXML
   private var regularField: TextArea = _
   @FXML
   private var dbBox: ChoiceBox[String] = _
@@ -39,12 +41,15 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
   private val hashValue: TextArea = new TextArea()
   private val selectListener: ChangeListener[String] = (_, _, newVal) => {
     val dataType = RedisDataType.getDataType(newVal)
+    this.scoreField.setDisable(true)
     dataType match {
       case RedisDataType.HASH =>
         if (contentBox.getChildren.size() <= 1) {
           this.contentBox.getChildren.add(hashValue)
         }
-        this.ttlField.setDisable(true)
+        this.ttlField.setDisable(false)
+      case RedisDataType.Z_SET =>
+        this.scoreField.setDisable(false)
       case _ =>
         this.ttlField.setDisable(false)
         this.contentBox.getChildren.remove(hashValue)
@@ -76,15 +81,22 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
     val client = RedisFxPaneController.getRedisClient(ownerController.uuid)
     val promise = this.showLoad[Boolean]("设置中...")
 
-    val future = if (dataType != RedisDataType.HASH) {
-      val ttl = this.ttlField.getText().toInt
-      client.setEx(keyVal, value, database, ttl)
-    } else {
+    val future = if (dataType == RedisDataType.HASH) {
       val hValue = hashValue.getText()
       val attr = new util.HashMap[String, String]() {
         this.put(value, hValue)
       }
       client.hSet(keyVal, attr, database)
+    } else if (dataType == RedisDataType.LIST) {
+      client.lPush(keyVal, value, database)
+    } else if (dataType == RedisDataType.SET) {
+      client.sAdd(keyVal, value, database)
+    } else if (dataType == RedisDataType.Z_SET) {
+      val score = this.scoreField.getText.toInt
+      client.zAdd(keyVal, value, score, database)
+    } else {
+      val ttl = this.ttlField.getText().toInt
+      client.setEx(keyVal, value, database, ttl)
     }
     future onComplete {
       case Success(value) => promise.success(value)
