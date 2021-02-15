@@ -5,12 +5,11 @@ import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisDatabaseItemConstant.DB_ICON
 import cn.navigational.redisfx.model.RedisKey
 import cn.navigational.redisfx.util.RedisDataUtil
-import javafx.application.Platform
 import javafx.scene.image.{Image, ImageView}
 
 import scala.concurrent.Await
-import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 import scala.concurrent.duration.Duration
 
 object RedisDatabaseItemConstant {
@@ -30,14 +29,10 @@ class RedisDatabaseItem(val index: Int, val uuid: String) extends RedisFxTreeIte
   override def refreshEvent(): Unit = {
     val future = this._refresh[Array[RedisKey]](() => {
       val keys = Await.result[Array[String]](RedisFxPaneController.getRedisClient(uuid).lsAllKey(index), Duration.Inf)
-      RedisDataUtil.getRedisKeyTreeData(keys, index)
+      RedisDataUtil.getRedisKeyTreeData(keys, index, uuid)
     })
     future onComplete {
-      case Success(arr) =>
-        Platform.runLater(() => {
-          getChildren.clear()
-          arr.foreach(it => getChildren.add(new RedisKeyTreeItem(it)))
-        })
+      case Success(arr) => this.createChildNode(arr)
       case Failure(ex) =>
     }
   }

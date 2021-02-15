@@ -4,7 +4,6 @@ import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.pane.RedisClientTabPaneController
 import cn.navigational.redisfx.enums.RedisDataType
-import cn.navigational.redisfx.helper.NotificationHelper
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML

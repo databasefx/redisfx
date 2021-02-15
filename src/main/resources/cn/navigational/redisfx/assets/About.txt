@@ -1,6 +1,6 @@
   RedisFX是一款基于JavaFx&scala编写的开源、免费、跨平台、高性能redis数据管理程序。
 
-  RedisFx 1.0 做了什么?
+  RedisFx 1.0 有哪些功能?
 
   * 实现连接信息本地保存.
   * 实现Jedis连接Redis服务器.

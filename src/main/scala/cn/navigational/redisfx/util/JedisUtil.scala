@@ -22,6 +22,10 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
     this.executeCommand[Array[String]](jedis => jedis.keys("*").asScala.toArray, database)
   }
 
+  def lsKey(pattern: String, database: Int): Future[Array[String]] = {
+    this.executeCommand[Array[String]](jedis => jedis.keys(pattern).asScala.toArray, database)
+  }
+
   def get(key: String, database: Int): Future[String] = {
     this.executeCommand[String](jedis => jedis.get(key), database)
   }

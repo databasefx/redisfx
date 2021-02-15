@@ -52,7 +52,7 @@ object RedisDataUtil {
    * @param array 目标数据
    * @return
    */
-  def getRedisKeyTreeData(array: Array[String], di: Int): Array[RedisKey] = {
+  def getRedisKeyTreeData(array: Array[String], di: Int, uuid: String): Array[RedisKey] = {
     val keys: ArrayBuffer[RedisKey] = new ArrayBuffer()
     for (elem <- array) {
       val index = elem.indexOf(FILE_SEPARATOR)
@@ -68,7 +68,7 @@ object RedisDataUtil {
         } else {
           option.get
         }
-        mapRedisKey(elem.substring(index + 1), di, redisKey)
+        mapRedisKey(elem.substring(index + 1), di, redisKey, uuid)
         if (add) {
           keys.addOne(redisKey)
         }
@@ -83,23 +83,23 @@ object RedisDataUtil {
    * @param key redis key
    */
   @tailrec
-  private def mapRedisKey(key: String, di: Int, parent: RedisKey): Unit = {
+  private def mapRedisKey(key: String, di: Int, parent: RedisKey, uuid: String): Unit = {
     val keys = parent.sub
     val index = key.indexOf(FILE_SEPARATOR)
     if (index == -1) {
-      keys.addOne(new RedisKey(key, di, parent))
+      keys.addOne(new RedisKey(key, di, uuid))
       return
     }
     val str = key.substring(0, index)
     val leftStr = key.substring(index + 1)
     val option = keys.find(it => it.key.equals(str))
     val rk = if (option.isEmpty) {
-      val temp = new RedisKey(str, di, parent)
+      val temp = new RedisKey(str, di, uuid)
       keys.addOne(temp)
       temp
     } else {
       option.get
     }
-    this.mapRedisKey(leftStr, di, rk)
+    this.mapRedisKey(leftStr, di, rk, uuid)
   }
 }

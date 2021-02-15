@@ -3,7 +3,7 @@ package cn.navigational.redisfx.controller.pane
 import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.{AddRedisKeyController, RedisFxPaneController}
-import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
+import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFolderItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{TabPane, TreeItem, TreeView}
@@ -46,6 +46,7 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
               tabPane.getSelectionModel.select(tab)
             }
           case rk: RedisDatabaseItem =>
+          case rf: RedisFolderItem =>
         }
       }
     })
@@ -126,45 +127,5 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
       case Failure(ex) => promise.failure(ex)
     }
   }
-
-  //  private def createContextMenu(): ContextMenu = {
-  //    val option = Option(this.treeView.getSelectionModel.getSelectedItem)
-  //    if (option.isEmpty) {
-  //      return new ContextMenu()
-  //    }
-  //    val item = option.get
-  //    item match {
-  //      case item: RedisKeyTreeItem => new RedisKeyContextMenu(item)
-  //      case item: RedisDatabaseItem => new RedisDatabaseContextMenu(item)
-  //    }
-  //  }
-
-  //  private class RedisDatabaseContextMenu(val db: RedisDatabaseItem) extends ContextMenu {
-  //    private val flush: MenuItem = new MenuItem("刷新") {
-  //      this.setOnAction(_ => {
-  //        val promise = RedisClientTabPaneController.this.showLoad[Unit]("刷新中....")
-  //        val future = RedisFxPaneController.getRedisClient(uuid).lsAllKey(db.index)
-  //        future onComplete {
-  //          case Success(value) =>
-  //            val list = RedisDataUtil.getRedisKeyTreeData(value, db.index)
-  //            Platform.runLater(() => {
-  //              if (!db.getChildren.isEmpty) {
-  //                db.getChildren.clear()
-  //              }
-  //              list.foreach(it => db.getChildren.add(new RedisKeyTreeItem(it)))
-  //            })
-  //            promise.success()
-  //          case Failure(ex) => promise.failure(ex)
-  //        }
-  //      })
-  //    }
-  //    {
-  //      this.getItems.add(flush)
-  //    }
-  //  }
-
-  //  private class RedisKeyContextMenu(val keyTreeItem: RedisKeyTreeItem) extends ContextMenu {
-  //
-  //  }
 
 }

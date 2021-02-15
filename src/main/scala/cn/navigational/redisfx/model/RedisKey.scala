@@ -1,18 +1,18 @@
 package cn.navigational.redisfx.model
 
-import cn.navigational.redisfx.util.RedisDataUtil
-
 import scala.collection.mutable.ArrayBuffer
-import scala.jdk.CollectionConverters.BufferHasAsJava
 
 /**
  *
  *
  * Redis key
  *
- * @param key redis key值
+ * @param key    redis key值
+ * @param index  数据库指数
+ * @param uuid   缓存连接id
+ *
  */
-class RedisKey(val key: String, val index: Int, val parent: RedisKey) {
+class RedisKey(val key: String, val index: Int, val uuid: String) {
   val sub: ArrayBuffer[RedisKey] = ArrayBuffer()
 
   /**
@@ -22,16 +22,5 @@ class RedisKey(val key: String, val index: Int, val parent: RedisKey) {
    */
   def isLeaf: Boolean = {
     this.sub.isEmpty
-  }
-
-  def rowKey: String = {
-    val arr = new ArrayBuffer[String]()
-    arr.addOne(key)
-    var temp = parent
-    while (temp != null) {
-      arr.addOne(temp.key)
-      temp = temp.parent
-    }
-    String.join(RedisDataUtil.FILE_SEPARATOR, arr.reverse.asJava)
   }
 }

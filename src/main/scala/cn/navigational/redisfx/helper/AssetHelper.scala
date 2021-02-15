@@ -5,7 +5,7 @@ import javafx.scene.image.Image
 
 object AssetHelper {
   //app全局样式
-  val APP_STYLE: String = RedisFxResource.load("css/app.css").toExternalForm
+  val APP_STYLE: String = RedisFxResource.load("css/AppStyle.css").toExternalForm
   //app默认图标
   val APP_ICON = new Image(ClassLoader.getSystemResourceAsStream("cn/navigational/redisfx/assets/icon/icon.png"))
   //app默认图标2x

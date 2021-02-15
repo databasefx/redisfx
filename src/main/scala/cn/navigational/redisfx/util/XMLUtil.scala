@@ -19,7 +19,7 @@ object XMLUtil {
       DocumentHelper.parseText(str)
       valid = true
     } catch {
-      case ex: Exception => ex.printStackTrace()
+      case ex: Exception =>
     }
     valid
   }
