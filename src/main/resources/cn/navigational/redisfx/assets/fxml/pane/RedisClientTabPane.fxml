@@ -62,21 +62,21 @@
             </TabPane>
         </SplitPane>
     </Tab>
-    <Tab closable="false">
-        <graphic>
-            <ImageView>
-                <Image url="@../../icon/terminal.png"/>
-            </ImageView>
-        </graphic>
-        <content>
-            <TextArea styleClass="redis-terminal"/>
-        </content>
-    </Tab>
-    <Tab closable="false">
-        <graphic>
-            <ImageView>
-                <Image url="@../../icon/redis-sys.png"/>
-            </ImageView>
-        </graphic>
-    </Tab>
+<!--    <Tab closable="false">-->
+<!--        <graphic>-->
+<!--            <ImageView>-->
+<!--                <Image url="@../../icon/terminal.png"/>-->
+<!--            </ImageView>-->
+<!--        </graphic>-->
+<!--        <content>-->
+<!--            <TextArea styleClass="redis-terminal"/>-->
+<!--        </content>-->
+<!--    </Tab>-->
+<!--    <Tab closable="false">-->
+<!--        <graphic>-->
+<!--            <ImageView>-->
+<!--                <Image url="@../../icon/redis-sys.png"/>-->
+<!--            </ImageView>-->
+<!--        </graphic>-->
+<!--    </Tab>-->
 </TabPane>
