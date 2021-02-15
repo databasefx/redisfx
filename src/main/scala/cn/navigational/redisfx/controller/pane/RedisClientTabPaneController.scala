@@ -55,7 +55,11 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
 
   @FXML
   def refresh(): Unit = {
-    currentTreeItem().foreach(target => target.refreshEvent())
+    if (treeView.getRoot.getChildren.isEmpty) {
+      this.loadAllDB()
+    } else {
+      currentTreeItem().foreach(target => target.refreshEvent())
+    }
   }
 
   @FXML
