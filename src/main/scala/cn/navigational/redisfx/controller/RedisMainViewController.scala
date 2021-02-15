@@ -3,6 +3,7 @@ package cn.navigational.redisfx.controller
 import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisMainViewController.redisConnectList
+import cn.navigational.redisfx.enums.TableMenAction
 import cn.navigational.redisfx.helper.{JedisHelper, NotificationHelper}
 import cn.navigational.redisfx.io.RedisFxIO
 import cn.navigational.redisfx.model.RedisConnectInfo
@@ -12,7 +13,7 @@ import javafx.collections.{FXCollections, ListChangeListener, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.Node
-import javafx.scene.control.{MenuItem, TableView}
+import javafx.scene.control.{ContextMenu, MenuItem, TableView}
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{AnchorPane, BorderPane}
@@ -24,21 +25,6 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object RedisMainViewController {
   val redisConnectList: ObservableList[RedisConnectInfo] = FXCollections.observableArrayList()
-}
-
-object TableMenuAction extends Enumeration {
-  type TableMenuAction = Value
-  val OPEN, EDIT, DELETE = Value
-
-  def getAction(str: String): TableMenuAction = {
-    if (str.equals(OPEN.toString)) {
-      OPEN
-    } else if (str.equals(EDIT.toString)) {
-      EDIT
-    } else {
-      DELETE
-    }
-  }
 }
 
 class RedisMainViewController extends AbstractViewController[BorderPane]("RedisFX Desktop Client", RedisFxResource.load("fxml/RedisMainView.fxml")) {
@@ -82,6 +68,15 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
       column.setCellValueFactory(new PropertyValueFactory(field))
       index += 1
     })
+    val cMenu = new ContextMenu()
+    TableMenAction.values().foreach(it => {
+      val item = new MenuItem(it.getName) {
+        this.setUserData(it)
+        this.setOnAction(tableViewMenuAction)
+      }
+      cMenu.getItems.add(item)
+    })
+    this.tableView.setContextMenu(cMenu)
     this.loadPerConfigFromDisk()
   }
 
@@ -110,24 +105,23 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
    *
    * @param event 事件源
    */
-  @FXML
-  def tableViewMenuAction(event: ActionEvent): Unit = {
+  private def tableViewMenuAction(event: ActionEvent): Unit = {
     val selectItem = tableView.getSelectionModel.getSelectedItem
     if (selectItem == null) {
       return
     }
     val items = this.tableView.getItems
     val item = event.getSource.asInstanceOf[MenuItem]
-    val action = TableMenuAction.getAction(item.getUserData.toString)
+    val action = item.getUserData
     action match {
-      case TableMenuAction.OPEN =>
+      case TableMenAction.OPEN =>
         //更新最后使用时间
         selectItem.setLastUseDate(DateUtil.formatNow())
         RedisFxIO.saveConnectFile(items.asScala.toArray)
         this.tableView.refresh()
         RedisFxPaneController.addRedisClient(selectItem)
-      case TableMenuAction.EDIT =>
-      case TableMenuAction.DELETE =>
+      case TableMenAction.EDIT =>
+      case TableMenAction.DELETE =>
         val result = NotificationHelper.showConfirmAlert(msg = "你确定要删除该连接?")
         if (!result) {
           return

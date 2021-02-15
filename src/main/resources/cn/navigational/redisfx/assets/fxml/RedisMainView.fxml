@@ -75,15 +75,6 @@
     </top>
     <center>
         <TableView fx:id="tableView">
-            <contextMenu>
-                <ContextMenu>
-                    <items>
-                        <MenuItem text="打开" userData="OPEN" onAction="#tableViewMenuAction"/>
-                        <MenuItem text="编辑" userData="EDIT" onAction="#tableViewMenuAction"/>
-                        <MenuItem text="删除" userData="DELETE" onAction="#tableViewMenuAction"/>
-                    </items>
-                </ContextMenu>
-            </contextMenu>
             <columns>
                 <TableColumn text="名称"/>
                 <TableColumn text="主机"/>
