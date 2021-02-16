@@ -11,6 +11,10 @@ plugins {
 group 'cn.navigational'
 version '1.0-SNAPSHOT'
 
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
 mainClassName = 'cn.navigational.redisfx.Launcher'
 
 //jvm args
