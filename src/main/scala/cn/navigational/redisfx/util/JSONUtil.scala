@@ -61,7 +61,12 @@ object JSONUtil {
    * @return 格式化返回字符串
    */
   def formatJsonStr(str: String): String = {
-    JSON.toJSONString(str, true)
+    val json = JSON.parse(str)
+    if (!json.isInstanceOf[String]) {
+      JSON.toJSONString(json, true)
+    } else {
+      json.toString
+    }
   }
 
   /**

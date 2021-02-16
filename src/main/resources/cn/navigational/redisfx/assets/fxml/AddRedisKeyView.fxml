@@ -26,7 +26,7 @@
     <TextField GridPane.rowIndex="9" disable="true" fx:id="scoreField" text="0"/>
     <Label text="值:" GridPane.rowIndex="10"/>
     <VBox GridPane.rowIndex="11" styleClass="content-box" fx:id="contentBox">
-        <TextArea fx:id="regularField"/>
+        <TextArea fx:id="regularField" wrapText="true"/>
     </VBox>
     <HBox GridPane.rowIndex="12" styleClass="bottom-box">
         <Button text="保存" onAction="#createRedisKey"/>
