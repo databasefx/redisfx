@@ -21,18 +21,13 @@ jobs:
       - name: Make staging directory
         run: mkdir staging
 
-      - name: Gluon License
-        uses: gluonhq/gluon-build-license@v1
-        with:
-          gluon-license: ${{ secrets.GLUON_LICENSE }}
-
-      - name: Gluon Build
-        run: mvn -Pdesktop client:build client:package
+      - name: Native Image Build
+        run: gradle -Pdesktop nativeBuild nativePackage
         env:
           GRAALVM_HOME: ${{ env.JAVA_HOME }}
 
       - name: Copy native client to staging
-        run: cp -r target/client/x86_64-linux/HelloGluon* staging
+        run: cp -r target/client/x86_64-linux/* staging
 
       - name: Upload
         uses: actions/upload-artifact@v2
