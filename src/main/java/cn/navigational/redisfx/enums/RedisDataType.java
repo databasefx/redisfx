@@ -9,32 +9,44 @@ public enum RedisDataType {
     /**
      * set type
      */
-    SET("set"),
+    SET(false, "set", true),
     /**
      * list type
      */
-    LIST("list"),
+    LIST(false, "list", true),
     /**
      * hash type
      */
-    HASH("hash"),
+    HASH(false, "hash", true),
     /**
      * zset type
      */
-    Z_SET("zset"),
+    Z_SET(false, "zset", true),
     /**
      * string type
      */
-    STRING("string");
+    STRING(true, "string", true);
 
+    private final boolean ttl;
     private final String name;
+    private final boolean edit;
 
-    RedisDataType(String name) {
+    RedisDataType(boolean ttl, String name, boolean edit) {
+        this.ttl = ttl;
         this.name = name;
+        this.edit = edit;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean isTtl() {
+        return ttl;
+    }
+
+    public boolean isEdit() {
+        return edit;
     }
 
     public static RedisDataType getDataType(String str) {

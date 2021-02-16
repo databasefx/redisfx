@@ -42,6 +42,7 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
   private val selectListener: ChangeListener[String] = (_, _, newVal) => {
     val dataType = RedisDataType.getDataType(newVal)
     this.scoreField.setDisable(true)
+    this.ttlField.setDisable(!dataType.isTtl)
     dataType match {
       case RedisDataType.HASH =>
         if (contentBox.getChildren.size() <= 1) {
@@ -80,23 +81,21 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
     val database = this.dbBox.getSelectionModel.getSelectedIndex
     val client = RedisFxPaneController.getRedisClient(ownerController.uuid)
     val promise = this.showLoad[Boolean]("设置中...")
-
-    val future = if (dataType == RedisDataType.HASH) {
-      val hValue = hashValue.getText()
-      val attr = new util.HashMap[String, String]() {
-        this.put(value, hValue)
-      }
-      client.hSet(keyVal, attr, database)
-    } else if (dataType == RedisDataType.LIST) {
-      client.lPush(keyVal, value, database)
-    } else if (dataType == RedisDataType.SET) {
-      client.sAdd(keyVal, value, database)
-    } else if (dataType == RedisDataType.Z_SET) {
-      val score = this.scoreField.getText.toInt
-      client.zAdd(keyVal, value, score, database)
-    } else {
-      val ttl = this.ttlField.getText().toInt
-      client.setEx(keyVal, value, database, ttl)
+    val future = dataType match {
+      case RedisDataType.HASH =>
+        val hValue = hashValue.getText()
+        val attr = new util.HashMap[String, String]() {
+          this.put(value, hValue)
+        }
+        client.hSet(keyVal, attr, database)
+      case RedisDataType.LIST => client.lPush(keyVal, value, database)
+      case RedisDataType.SET => client.sAdd(keyVal, value, database)
+      case RedisDataType.Z_SET =>
+        val score = this.scoreField.getText.toInt
+        client.zAdd(keyVal, value, score, database)
+      case _ =>
+        val ttl = this.ttlField.getText().toInt
+        client.setEx(keyVal, value, database, ttl)
     }
     future onComplete {
       case Success(value) => promise.success(value)
