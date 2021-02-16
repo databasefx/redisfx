@@ -6,7 +6,6 @@ import cn.navigational.redisfx.util.{AESUtil, JSONUtil, StringUtil}
 import com.alibaba.fastjson.JSONArray
 
 import java.io.File
-import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global

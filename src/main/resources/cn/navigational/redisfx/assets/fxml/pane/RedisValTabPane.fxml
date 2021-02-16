@@ -26,13 +26,19 @@
                 </ToolBar>
             </HBox>
             <HBox>
-                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="10">
-                    <Label text="数据大小:"/>
-                    <Label fx:id="dataSize"/>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                    <HBox>
+                        <Label text="数据大小:"/>
+                        <Label fx:id="dataSize"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="数据格式:"/>
+                        <Label fx:id="dataFormat"/>
+                    </HBox>
                 </HBox>
                 <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="10">
-                    <Label text="数据格式:"/>
-                    <ChoiceBox fx:id="dataFormat"/>
+                    <Label text="视图格式:"/>
+                    <ChoiceBox fx:id="dataViewFormat"/>
                 </HBox>
             </HBox>
         </VBox>

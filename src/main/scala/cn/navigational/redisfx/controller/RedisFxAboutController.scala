@@ -16,7 +16,7 @@ class RedisFxAboutController extends AbstractViewController("关于", RedisFxRes
 
   {
     this.initText()
-    this.setWindowSizeByProp(0.5,0.7)
+    this.setWindowSizeByProp(0.5, 0.7)
     this.getStage.showAndWait()
   }
 

@@ -28,9 +28,11 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   @FXML
   private var dataSize: Label = _
   @FXML
+  private var dataFormat: Label = _
+  @FXML
   private var keyTextF: TextField = _
   @FXML
-  private var dataFormat: ChoiceBox[String] = _
+  private var dataViewFormat: ChoiceBox[String] = _
   private val viewDataTypeListener: ChangeListener[String] = (_, _, newVal) => {
     this.initVal(RedisDataViewFormat.getViewFormat(newVal))
   }
@@ -38,12 +40,12 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   {
     initVal()
     for (item <- RedisDataViewFormat.values()) {
-      dataFormat.getItems.add(item.getName)
+      dataViewFormat.getItems.add(item.getName)
     }
-    dataFormat.getSelectionModel.select(RedisDataViewFormat.PLAINT_TEXT.getName)
-    dataFormat.getSelectionModel.selectedItemProperty().addListener(this.viewDataTypeListener)
+    dataViewFormat.getSelectionModel.select(RedisDataViewFormat.PLAINT_TEXT.getName)
+    dataViewFormat.getSelectionModel.selectedItemProperty().addListener(this.viewDataTypeListener)
     //移出监听程序
-    this.valTab.setOnCloseRequest(_ => dataFormat.getSelectionModel.selectedItemProperty().removeListener(this.viewDataTypeListener))
+    this.valTab.setOnCloseRequest(_ => dataViewFormat.getSelectionModel.selectedItemProperty().removeListener(this.viewDataTypeListener))
   }
 
   @FXML
@@ -87,7 +89,7 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     })
   }
 
-  private def updateText(text: String, ttl: Long, viewFormat: RedisDataViewFormat = null): Unit = {
+  private def updateText(text: String, ttl: Long, viewFormat: RedisDataViewFormat = null, format: RedisDataType): Unit = {
     val size = text.getBytes(Charset.forName("UTF8")).length
     var formatVal = text
     var tempFormat = viewFormat
@@ -99,10 +101,11 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
 
     Platform.runLater(() => {
       this.textArea.setText(formatVal)
-      this.dataSize.setText(s"$size 字节")
       this.tLabel.setText(s"TTL:$ttl")
+      this.dataSize.setText(s"$size 字节")
       this.keyTextF.setText(valTab.redisKey)
-      dataFormat.getSelectionModel.select(tempFormat.getName)
+      this.dataFormat.setText(format.getName)
+      this.dataViewFormat.getSelectionModel.select(tempFormat.getName)
     })
   }
 
@@ -136,7 +139,7 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
           RedisDataUtil.formatListVal(arr)
         case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
       }
-      this.updateText(text, ttl, viewFormat)
+      this.updateText(text, ttl, viewFormat, dataType)
       promise.success()
     } catch {
       case ex: Exception => promise.failure(ex)
