@@ -5,15 +5,12 @@ plugins {
     id 'scala'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'com.gluonhq.client-gradle-plugin' version '0.1.36'
+//    id 'com.gluonhq.client-gradle-plugin' version '0.1.36'
 }
 
 group 'cn.navigational'
 version '1.0-SNAPSHOT'
 
-
-sourceCompatibility = 11
-targetCompatibility = 11
 
 mainClassName = 'cn.navigational.redisfx.Launcher'
 
@@ -26,9 +23,9 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.graphics']
 }
 
-gluonClient {
-    graalvmHome = '/home/yangkui/application/graalvm'
-}
+//gluonClient {
+//    graalvmHome = '/home/yangkui/application/graalvm'
+//}
 sourceSets {
     main {
         scala {
