@@ -2,17 +2,25 @@ package cn.navigational.redisfx.io
 
 import cn.navigational.redisfx.AppPlatform
 import cn.navigational.redisfx.model.RedisConnectInfo
-import cn.navigational.redisfx.util.JSONUtil
+import cn.navigational.redisfx.util.{AESUtil, JSONUtil, StringUtil}
+import com.alibaba.fastjson.JSONArray
 
 import java.io.File
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
-import java.util
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 object RedisFxIO {
+  /**
+   * 默认AES KEY根据实际情况自行修改
+   */
+  private val AES_KEY: String = "$123dafdlag"
+  /**
+   * 连接配置保存路径
+   */
   private val REDIS_CONNECT_FILE = new File(s"${AppPlatform.getApplicationDataFolder}${File.separator}redis_connect_info.json")
 
   /**
@@ -22,8 +30,8 @@ object RedisFxIO {
    */
   def saveConnectInfo(info: RedisConnectInfo): Future[Unit] = Future {
     val arr = Await.result(getConnectFile, Duration.Inf)
-    arr :+ info
-    Await.result[Boolean](this.saveConnectFile(arr), Duration.Inf)
+    val nArr = arr :+ info
+    Await.result[Boolean](this.saveConnectFile(nArr), Duration.Inf)
   }
 
   /**
@@ -38,7 +46,13 @@ object RedisFxIO {
     } else {
       val bytes = Files.readAllBytes(path)
       val list = JSONUtil.strToArr(new String(bytes), classOf[RedisConnectInfo])
-      list.forEach(it => arr.addOne(it))
+
+      list.forEach(it => {
+        if (StringUtil.isNotEmpty(it.password)) {
+          it.password = AESUtil.decrypt(it.password, AES_KEY)
+        }
+        arr.addOne(it)
+      })
     }
     arr.toArray
   }
@@ -50,11 +64,16 @@ object RedisFxIO {
    */
   def saveConnectFile(arr: Array[RedisConnectInfo]): Future[Boolean] = Future {
     val path = Path.of(REDIS_CONNECT_FILE.toURI)
-    val list: util.List[RedisConnectInfo] = new util.ArrayList()
+    val list = new JSONArray()
     for (element <- arr) {
-      list.add(element)
+      val json = JSONUtil.objToJsonObj(element)
+      val password = element.password
+      if (StringUtil.isNotEmpty(password)) {
+        json.put("password", AESUtil.encrypt(password, AES_KEY))
+      }
+      list.add(json)
     }
-    Files.writeString(path, JSONUtil.objToJson(list))
+    Files.writeString(path, list.toJSONString)
     true
   }
 }

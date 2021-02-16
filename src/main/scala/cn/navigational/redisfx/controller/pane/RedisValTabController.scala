@@ -129,7 +129,7 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
           RedisDataUtil.formatListVal(list)
         case RedisDataType.SET =>
           val arr = Await.result[Array[String]](client.sMember(valTab.redisKey, valTab.index), Duration.Inf)
-          JSONUtil.objToJson(arr)
+          JSONUtil.objToJsonStr(arr)
         case RedisDataType.Z_SET =>
           val len = Await.result[Long](client.zCard(valTab.redisKey, valTab.index), Duration.Inf)
           val arr = Await.result[Array[String]](client.zRange(valTab.redisKey, 0, len, valTab.index), Duration.Inf)

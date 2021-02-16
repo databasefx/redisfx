@@ -7,7 +7,7 @@ import cn.navigational.redisfx.enums.RedisDataType
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
-import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
+import javafx.scene.control.{ChoiceBox, TextArea, TextField}
 import javafx.scene.layout.{GridPane, VBox}
 import javafx.stage.WindowEvent
 

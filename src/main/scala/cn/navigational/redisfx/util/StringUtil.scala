@@ -15,4 +15,12 @@ object StringUtil {
     }
     sb.toString
   }
+
+  def isEmpty(str: String): Boolean = {
+    str == null || str.trim == ""
+  }
+
+  def isNotEmpty(str: String): Boolean = {
+    !this.isEmpty(str)
+  }
 }

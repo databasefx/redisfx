@@ -31,7 +31,7 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
   }
 
   def hGet(key: String, database: Int): Future[String] = {
-    this.executeCommand[String](jedis => JSONUtil.objToJson(jedis.hgetAll(key)), database)
+    this.executeCommand[String](jedis => JSONUtil.objToJsonStr(jedis.hgetAll(key)), database)
   }
 
   /**

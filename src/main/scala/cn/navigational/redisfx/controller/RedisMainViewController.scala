@@ -120,7 +120,6 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
         RedisFxIO.saveConnectFile(items.asScala.toArray)
         this.tableView.refresh()
         RedisFxPaneController.addRedisClient(selectItem)
-      case TableMenAction.EDIT =>
       case TableMenAction.DELETE =>
         val result = NotificationHelper.showConfirmAlert(msg = "你确定要删除该连接?")
         if (!result) {

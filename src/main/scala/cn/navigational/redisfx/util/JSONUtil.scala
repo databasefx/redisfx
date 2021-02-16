@@ -1,7 +1,6 @@
 package cn.navigational.redisfx.util
 
-import com.fasterxml.jackson.core.{FormatFeature, JsonParseException, JsonProcessingException}
-import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
+import com.alibaba.fastjson.{JSON, JSONObject}
 
 /**
  *
@@ -10,16 +9,25 @@ import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
  * @author yangkui
  */
 object JSONUtil {
-  private val objectMapper: ObjectMapper = new ObjectMapper()
-
   /**
    * 将java对象转换为json字符串
    *
    * @param obj java对象
    * @return 返回序列化后的字符串
    */
-  def objToJson(obj: Any): String = {
-    objectMapper.writeValueAsString(obj)
+  def objToJsonStr(obj: Any): String = {
+    JSON.toJSONString(obj)
+  }
+
+  /**
+   * 将pojo转换为JSONOBject对象
+   *
+   * @param obj 目标对象
+   * @return
+   */
+  def objToJsonObj(obj: Any): JSONObject = {
+    val jsonStr = objToJsonStr(obj)
+    JSON.parseObject(jsonStr)
   }
 
   /**
@@ -31,7 +39,7 @@ object JSONUtil {
    * @return
    */
   def strToObj[T](json: String, t: Class[T]): T = {
-    objectMapper.readValue(json, t)
+    JSON.parseObject(json, t)
   }
 
   /**
@@ -43,8 +51,7 @@ object JSONUtil {
    * @return
    */
   def strToArr[T](json: String, t: Class[T]): java.util.List[T] = {
-    val typeFactory = objectMapper.getTypeFactory
-    objectMapper.readValue(json, typeFactory.constructCollectionType(classOf[java.util.List[T]], t))
+    JSON.parseArray(json, t)
   }
 
   /**
@@ -54,9 +61,7 @@ object JSONUtil {
    * @return 格式化返回字符串
    */
   def formatJsonStr(str: String): String = {
-    val node = objectMapper.readTree(str)
-    val objWriter = objectMapper.writerWithDefaultPrettyPrinter()
-    objWriter.writeValueAsString(node)
+    JSON.toJSONString(str, true)
   }
 
   /**
@@ -66,14 +71,12 @@ object JSONUtil {
    * @return 返回判断结果
    */
   def validJSON(json: String): Boolean = {
-    var valid: Boolean = false
     try {
-      objectMapper.readTree(json)
-      valid = true
+      val obj = JSON.parse(json)
+      !obj.isInstanceOf[String]
     } catch {
-      case ex: Exception =>
+      case ex: Exception => false
     }
-    valid
   }
 
 }
