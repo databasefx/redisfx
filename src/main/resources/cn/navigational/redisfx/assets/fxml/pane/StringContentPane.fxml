@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            prefHeight="400.0" prefWidth="600.0">
+    <top>
+        <HBox styleClass="tool-bar">
+            <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                <HBox>
+                    <Label text="数据大小:"/>
+                    <Label fx:id="dataSize"/>
+                </HBox>
+                <HBox>
+                    <Label text="数据格式:"/>
+                    <Label fx:id="dataFormat"/>
+                </HBox>
+            </HBox>
+            <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="10">
+                <Label text="视图格式:"/>
+                <ChoiceBox fx:id="dataViewFormat"/>
+            </HBox>
+        </HBox>
+    </top>
+    <center>
+        <TextArea fx:id="textArea" editable="false" wrapText="true"/>
+    </center>
+</BorderPane>

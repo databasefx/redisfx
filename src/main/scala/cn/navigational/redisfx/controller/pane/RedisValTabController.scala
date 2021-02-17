@@ -8,12 +8,10 @@ import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
 import cn.navigational.redisfx.helper.NotificationHelper
 import cn.navigational.redisfx.util.{JSONUtil, RedisDataUtil}
 import javafx.application.Platform
-import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
-import javafx.scene.control.{ChoiceBox, Label, TextArea, TextField}
+import javafx.scene.control.{Label, TextField}
 import javafx.scene.layout.BorderPane
 
-import java.nio.charset.Charset
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,28 +22,15 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
   @FXML
   private var tLabel: Label = _
   @FXML
-  private var textArea: TextArea = _
-  @FXML
-  private var dataSize: Label = _
-  @FXML
-  private var dataFormat: Label = _
-  @FXML
   private var keyTextF: TextField = _
-  @FXML
-  private var dataViewFormat: ChoiceBox[String] = _
-  private val viewDataTypeListener: ChangeListener[String] = (_, _, newVal) => {
-    this.initVal(RedisDataViewFormat.getViewFormat(newVal))
+
+  private val contentPaneController = new StringContentPaneController() {
+    this.valTabController = RedisValTabController.this
   }
 
   {
     initVal()
-    for (item <- RedisDataViewFormat.values()) {
-      dataViewFormat.getItems.add(item.getName)
-    }
-    dataViewFormat.getSelectionModel.select(RedisDataViewFormat.PLAINT_TEXT.getName)
-    dataViewFormat.getSelectionModel.selectedItemProperty().addListener(this.viewDataTypeListener)
-    //移出监听程序
-    this.valTab.setOnCloseRequest(_ => dataViewFormat.getSelectionModel.selectedItemProperty().removeListener(this.viewDataTypeListener))
+    this.parent.setCenter(contentPaneController.getParent)
   }
 
   @FXML
@@ -89,26 +74,6 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     })
   }
 
-  private def updateText(text: String, ttl: Long, viewFormat: RedisDataViewFormat = null, format: RedisDataType): Unit = {
-    val size = text.getBytes(Charset.forName("UTF8")).length
-    var formatVal = text
-    var tempFormat = viewFormat
-    //如果未指定数据格式=>自动判断
-    if (viewFormat == null) {
-      tempFormat = RedisDataUtil.getRedisDataViewFormat(text)
-    }
-    formatVal = RedisDataUtil.formatViewData(text, tempFormat)
-
-    Platform.runLater(() => {
-      this.textArea.setText(formatVal)
-      this.tLabel.setText(s"TTL:$ttl")
-      this.dataSize.setText(s"$size 字节")
-      this.keyTextF.setText(valTab.redisKey)
-      this.dataFormat.setText(format.getName)
-      this.dataViewFormat.getSelectionModel.select(tempFormat.getName)
-    })
-  }
-
   @FXML
   def reloadVal(): Unit = {
     this.initVal()
@@ -118,7 +83,7 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
    * 加载value值
    *
    */
-  def initVal(viewFormat: RedisDataViewFormat = null): Future[Unit] = Future {
+  def initVal(): Future[Unit] = Future {
     val promise = showLoad[Unit]()
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
@@ -139,7 +104,11 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
           RedisDataUtil.formatListVal(arr)
         case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
       }
-      this.updateText(text, ttl, viewFormat, dataType)
+      Platform.runLater(() => {
+        this.tLabel.setText(s"TTL:$ttl")
+        this.keyTextF.setText(valTab.redisKey)
+        contentPaneController.contentUpdate(text, dataType)
+      })
       promise.success()
     } catch {
       case ex: Exception => promise.failure(ex)
