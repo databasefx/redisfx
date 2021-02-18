@@ -1,0 +1,23 @@
+.right-box {
+    -fx-padding: 0.5em;
+    -fx-pref-width: 22em;
+}
+
+.right-box VBox {
+    -fx-spacing: 0.5em;
+    -fx-alignment: TOP-CENTER;
+}
+
+.action-list .button {
+    -fx-pref-width: 18em;
+}
+
+.page-container {
+    -fx-spacing: 0.2em;
+    -fx-alignment: CENTER;
+}
+
+
+.page-container .button {
+    -fx-pref-width: 5em;
+}
