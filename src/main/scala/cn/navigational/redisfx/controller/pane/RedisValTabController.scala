@@ -4,7 +4,7 @@ import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
-import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
+import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.helper.NotificationHelper
 import cn.navigational.redisfx.util.{JSONUtil, RedisDataUtil}
 import javafx.application.Platform
@@ -30,7 +30,7 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
 
   {
     initVal()
-    this.parent.setCenter(contentPaneController.getParent)
+    this.innerPane.setCenter(contentPaneController.getParent)
   }
 
   @FXML

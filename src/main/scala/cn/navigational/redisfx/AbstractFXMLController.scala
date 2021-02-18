@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @since 1.0
  */
 abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
-  var parent: P = _
+  var innerPane: P = _
   private val rootPane: StackPane = new StackPane()
   protected val maskPaneController: ViewMaskPaneController = new ViewMaskPaneController()
 
@@ -32,7 +32,7 @@ abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
    * 获取FXML对应的视图对象
    */
   def getParent: StackPane = {
-    if (parent != null) {
+    if (innerPane != null) {
       return rootPane
     }
     initParent()
@@ -49,8 +49,8 @@ abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
       val fxmlLoader = new FXMLLoader()
       fxmlLoader.setController(this)
       fxmlLoader.setLocation(fxmlUrl)
-      parent = fxmlLoader.load[P]()
-      rootPane.getChildren.add(parent)
+      innerPane = fxmlLoader.load[P]()
+      rootPane.getChildren.add(innerPane)
       val option = initMaskPane()
       if (option.isDefined) {
         rootPane.getChildren.add(option.get)
