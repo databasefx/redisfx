@@ -25,6 +25,9 @@ abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
 
 
   {
+    if (fxmlUrl == null) {
+      throw new RuntimeException("fxmlUrl must can't null!")
+    }
     this.initParent()
   }
 
@@ -44,7 +47,6 @@ abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
    * @return
    */
   private def initParent(): StackPane = {
-    assert(fxmlUrl != null, message = "fxml文件路径不能为空")
     try {
       val fxmlLoader = new FXMLLoader()
       fxmlLoader.setController(this)
@@ -57,7 +59,7 @@ abstract class AbstractFXMLController[P <: Node](fxmlUrl: URL) {
       }
       rootPane
     } catch {
-      case ex: Any =>
+      case ex: Exception =>
         throw new RuntimeException(ex)
     }
   }

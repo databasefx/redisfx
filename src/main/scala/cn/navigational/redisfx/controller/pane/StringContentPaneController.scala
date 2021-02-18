@@ -3,16 +3,19 @@ package cn.navigational.redisfx.controller.pane
 import cn.navigational.redisfx.AbstractRedisContentService
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
-import cn.navigational.redisfx.util.RedisDataUtil
+import cn.navigational.redisfx.util.{JedisUtil, RedisDataUtil}
+import javafx.application.Platform
 import javafx.beans.value.ChangeListener
-import javafx.event.Event
 import javafx.fxml.FXML
 import javafx.scene.control.{ChoiceBox, Label, TextArea}
 import javafx.scene.layout.BorderPane
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import java.nio.charset.Charset
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
-class StringContentPaneController extends AbstractRedisContentService[BorderPane, String](RedisFxResource.load("fxml/pane/StringContentPane.fxml")) {
+class StringContentPaneController(valTabController: RedisValTabController) extends AbstractRedisContentService[BorderPane](valTabController, RedisFxResource.load("fxml/pane/StringContentPane.fxml")) {
   @FXML
   private var dataSize: Label = _
   @FXML
@@ -36,26 +39,32 @@ class StringContentPaneController extends AbstractRedisContentService[BorderPane
     dataViewFormat.getSelectionModel.selectedItemProperty().addListener(this.viewDataTypeListener)
   }
 
-
   /**
-   * 内容发生改变时调用
+   * 执行更新操作
    *
-   * @param data 外部传入数据
+   * @param client jedis工具类
+   * @param redisKey  key
+   * @param index     数据库指数
+   * @param dataType  redis数据类型
+   * @return
    */
-  override def contentUpdate(data: String, dataType: RedisDataType): Unit = {
+  override def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType): Future[Unit] = Future {
+    val data = Await.result[String](client.get(redisKey, index), Duration.Inf)
     val size = data.getBytes(Charset.forName("UTF8")).length
     //如果未指定数据格式=>自动判断
     if (viewFormat == null) {
       viewFormat = RedisDataUtil.getRedisDataViewFormat(data)
     }
     val formatVal = RedisDataUtil.formatViewData(data, viewFormat)
-    this.textArea.setText(formatVal)
-    this.dataSize.setText(s"$size 字节")
-    this.dataFormat.setText(dataType.getName)
-    this.dataViewFormat.getSelectionModel.select(viewFormat.getName)
+    Platform.runLater(() => {
+      this.textArea.setText(formatVal)
+      this.dataSize.setText(s"$size 字节")
+      this.dataFormat.setText(RedisDataType.STRING.getName)
+      this.dataViewFormat.getSelectionModel.select(viewFormat.getName)
+    })
   }
 
-  override def contentPaneRequestClose(event: Event): Unit = {
+  override def contentPaneRequestClose(): Unit = {
     this.dataViewFormat.getSelectionModel.selectedItemProperty().removeListener(this.viewDataTypeListener)
   }
 

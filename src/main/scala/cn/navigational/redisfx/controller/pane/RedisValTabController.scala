@@ -1,16 +1,19 @@
 package cn.navigational.redisfx.controller.pane
 
-import cn.navigational.redisfx.AbstractFXMLController
+import cn.navigational.redisfx.{AbstractFXMLController, AbstractRedisContentService}
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
 import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.helper.NotificationHelper
+import cn.navigational.redisfx.model.RedisContent
+import cn.navigational.redisfx.model.impl.BasicRedisContent
 import cn.navigational.redisfx.util.{JSONUtil, RedisDataUtil}
 import javafx.application.Platform
 import javafx.fxml.FXML
+import javafx.scene.Node
 import javafx.scene.control.{Label, TextField}
-import javafx.scene.layout.BorderPane
+import javafx.scene.layout.{BorderPane, Pane, Region}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -18,19 +21,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
 
-class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXMLController[BorderPane](RedisFxResource.load("fxml/pane/RedisValTabPane.fxml")) {
+class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLController[BorderPane](RedisFxResource.load("fxml/pane/RedisValTabPane.fxml")) {
   @FXML
   private var tLabel: Label = _
   @FXML
   private var keyTextF: TextField = _
 
-  private val contentPaneController = new StringContentPaneController() {
-    this.valTabController = RedisValTabController.this
-  }
+  private var contentPaneController: AbstractRedisContentService[_ <: Node] = _
 
   {
     initVal()
-    this.innerPane.setCenter(contentPaneController.getParent)
+    this.keyTextF.setText(valTab.redisKey)
   }
 
   @FXML
@@ -79,35 +80,26 @@ class RedisValTabController(private val valTab: RedisValTab) extends AbstractFXM
     this.initVal()
   }
 
-  /**
-   * 加载value值
-   *
-   */
   def initVal(): Future[Unit] = Future {
     val promise = showLoad[Unit]()
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
       val ttl = Await.result[Long](client.ttl(valTab.redisKey, valTab.index), Duration.Inf)
       val dataType = Await.result[RedisDataType](client.typeKey(valTab.redisKey, valTab.index), Duration.Inf)
-      val text = dataType match {
-        case RedisDataType.HASH => Await.result[String](client.hGet(valTab.redisKey, valTab.index), Duration.Inf)
-        case RedisDataType.LIST =>
-          val len = Await.result[Long](client.lLen(valTab.redisKey, valTab.index), Duration.Inf)
-          val list = Await.result[Array[String]](client.lRange(valTab.redisKey, 0, len, valTab.index), Duration.Inf)
-          RedisDataUtil.formatListVal(list)
-        case RedisDataType.SET =>
-          val arr = Await.result[Array[String]](client.sMember(valTab.redisKey, valTab.index), Duration.Inf)
-          JSONUtil.objToJsonStr(arr)
-        case RedisDataType.Z_SET =>
-          val len = Await.result[Long](client.zCard(valTab.redisKey, valTab.index), Duration.Inf)
-          val arr = Await.result[Array[String]](client.zRange(valTab.redisKey, 0, len, valTab.index), Duration.Inf)
-          RedisDataUtil.formatListVal(arr)
-        case _ => Await.result[String](client.get(valTab.redisKey, valTab.index), Duration.Inf)
+      if (this.contentPaneController != null) {
+        this.contentPaneController.contentPaneRequestClose()
       }
+      this.contentPaneController = if (dataType == RedisDataType.STRING) {
+        new StringContentPaneController(this)
+      } else {
+        val form = new FormContentPaneController(this)
+        println(form)
+        form
+      }
+      Await.result(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType), Duration.Inf)
       Platform.runLater(() => {
         this.tLabel.setText(s"TTL:$ttl")
-        this.keyTextF.setText(valTab.redisKey)
-        contentPaneController.contentUpdate(text, dataType)
+        this.innerPane.setCenter(this.contentPaneController.getParent)
       })
       promise.success()
     } catch {

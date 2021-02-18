@@ -45,8 +45,7 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
               }
               tabPane.getSelectionModel.select(tab)
             }
-          case rk: RedisDatabaseItem =>
-          case rf: RedisFolderItem =>
+          case _ =>
         }
       }
     })

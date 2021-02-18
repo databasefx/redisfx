@@ -2,10 +2,11 @@ package cn.navigational.redisfx
 
 import cn.navigational.redisfx.controller.pane.RedisValTabController
 import cn.navigational.redisfx.enums.RedisDataType
-import javafx.event.Event
+import cn.navigational.redisfx.util.JedisUtil
 import javafx.scene.Node
 
 import java.net.URL
+import scala.concurrent.Future
 
 
 /**
@@ -15,20 +16,21 @@ import java.net.URL
  * @author yangkui
  * @since 1.0
  */
-abstract class AbstractRedisContentService[P <: Node, D](fxml: URL) extends AbstractFXMLController[P](fxml) {
-  protected var valTabController: RedisValTabController = _
+abstract class AbstractRedisContentService[P <: Node](val valTabController: RedisValTabController, fxml: URL) extends AbstractFXMLController[P](fxml) {
 
   /**
    * 父级Pane关闭时调用
    */
-  def contentPaneRequestClose(event: Event): Unit
+  def contentPaneRequestClose(): Unit = {}
 
   /**
-   * 内容发生改变时调用
+   * 执行更新操作
    *
-   * @param dataType 数据类型
-   * @param data     外部传入数据
+   * @param client jedis工具类
+   * @param redisKey  key
+   * @param index     数据库指数
+   * @param dataType  redis数据类型
+   * @return
    */
-  def contentUpdate(data: D, dataType: RedisDataType): Unit
-
+  def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType): Future[Unit]
 }
