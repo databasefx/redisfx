@@ -16,7 +16,10 @@ jobs:
           graalvm-version: 21.0.0.java11
 
       - name: Install librariesf
-        run: sudo apt install libasound2-dev libavcodec-dev libavformat-dev libavutil-dev libgl-dev libgtk-3-dev libpango1.0-dev libxtst-dev
+        run: sudo apt install libasound2-dev libavcodec-dev libavformat-dev libavutil-dev libgl-dev libgtk-3-dev libpango1.0-dev libxtst-dev scala
+
+      - name: Scala version
+        run: scala -version
 
       - name: Make staging directory
         run: mkdir staging
