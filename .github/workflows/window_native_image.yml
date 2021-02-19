@@ -24,13 +24,13 @@ jobs:
       - name: Make staging directory
         run: mkdir staging
 
-      - name: Gluon Build
+      - name: EXECUTE NATIVE IMAGE
         run: ./gradlew --stacktrace nativeBuild nativePackage
         env:
           GRAALVM_HOME: ${{ env.JAVA_HOME }}
 
       - name: Copy native client to staging
-        run: cp -r target/client/x86_64-windows/redisfx.exe staging
+        run: cp -r target/client/x86_64-windows/* staging
 
       - name: Upload
         uses: actions/upload-artifact@v2

@@ -5,7 +5,7 @@ plugins {
     id 'scala'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'com.gluonhq.client-gradle-plugin' version '0.1.36'
+    id 'com.gluonhq.client-gradle-plugin' version '0.1.38'
 }
 
 group 'cn.navigational'
@@ -25,10 +25,10 @@ javafx {
     version = "15.0.1"
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.graphics']
 }
-//
-//gluonClient {
-//    graalvmHome = '/home/yangkui/application/graalvm'
-//}
+
+gluonClient {
+    graalvmHome = '/home/yangkui/application/graalvm'
+}
 
 //解决window乱码问题
 tasks.withType(JavaCompile) {
