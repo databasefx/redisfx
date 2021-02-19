@@ -27,7 +27,6 @@ javafx {
 }
 
 gluonClient {
-    target = 'android'
     graalvmHome = '/home/yangkui/application/graalvm'
 }
 sourceSets {
