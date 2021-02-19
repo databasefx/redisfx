@@ -30,7 +30,7 @@ jobs:
           GRAALVM_HOME: ${{ env.JAVA_HOME }}
 
       - name: Copy native client to staging
-        run: cp -r target/client/x86_64-windows/* staging
+        run: cp -r target/client/x86_64-windows/redisfx* staging
 
       - name: Upload
         uses: actions/upload-artifact@v2
