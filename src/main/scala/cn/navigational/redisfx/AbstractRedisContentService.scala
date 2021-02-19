@@ -26,11 +26,12 @@ abstract class AbstractRedisContentService[P <: Node](val valTabController: Redi
   /**
    * 执行更新操作
    *
-   * @param client jedis工具类
-   * @param redisKey  key
-   * @param index     数据库指数
-   * @param dataType  redis数据类型
+   * @param client   jedis工具类
+   * @param redisKey key
+   * @param index    数据库指数
+   * @param dataType redis数据类型
+   * @param update   如果当前Redis数据结构发生改变为{code true},否则为{@code false}
    * @return
    */
-  def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType): Future[Unit]
+  def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType, update: Boolean): Future[Unit]
 }

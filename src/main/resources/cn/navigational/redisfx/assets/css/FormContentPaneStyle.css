@@ -19,5 +19,5 @@
 
 
 .page-container .button {
-    -fx-pref-width: 5em;
+    -fx-padding: 0 0.5em;
 }

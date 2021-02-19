@@ -5,14 +5,16 @@ package cn.navigational.redisfx.model;
  * @since 1.0
  */
 public class RedisRichValueModel {
-    private String index;
+    private String key;
     private String value;
+    private Integer index;
+    private Double score;
 
-    public String getIndex() {
+    public Integer getIndex() {
         return index;
     }
 
-    public void setIndex(String index) {
+    public void setIndex(Integer index) {
         this.index = index;
     }
 
@@ -22,5 +24,21 @@ public class RedisRichValueModel {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
     }
 }

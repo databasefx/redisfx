@@ -9,32 +9,34 @@ public enum RedisDataType {
     /**
      * set type
      */
-    SET(false, "set", true),
+    SET(false, "set", true, true),
     /**
      * list type
      */
-    LIST(false, "list", true),
+    LIST(false, "list", true, true),
     /**
      * hash type
      */
-    HASH(false, "hash", true),
+    HASH(false, "hash", true, false),
     /**
      * zset type
      */
-    Z_SET(false, "zset", true),
+    Z_SET(false, "zset", true, true),
     /**
      * string type
      */
-    STRING(true, "string", true);
+    STRING(true, "string", true, false);
 
     private final boolean ttl;
     private final String name;
     private final boolean edit;
+    private final boolean paging;
 
-    RedisDataType(boolean ttl, String name, boolean edit) {
+    RedisDataType(boolean ttl, String name, boolean edit, boolean paging) {
         this.ttl = ttl;
         this.name = name;
         this.edit = edit;
+        this.paging = paging;
     }
 
     public String getName() {
@@ -65,5 +67,9 @@ public enum RedisDataType {
             throw new RuntimeException("未知Redis数据类型");
         }
         return dataType;
+    }
+
+    public boolean isPaging() {
+        return paging;
     }
 }

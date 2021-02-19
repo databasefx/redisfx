@@ -48,7 +48,7 @@ class StringContentPaneController(valTabController: RedisValTabController) exten
    * @param dataType  redis数据类型
    * @return
    */
-  override def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType): Future[Unit] = Future {
+  override def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType,update: Boolean): Future[Unit] = Future {
     val data = Await.result[String](client.get(redisKey, index), Duration.Inf)
     val size = data.getBytes(Charset.forName("UTF8")).length
     //如果未指定数据格式=>自动判断

@@ -26,6 +26,10 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
   private var tLabel: Label = _
   @FXML
   private var keyTextF: TextField = _
+  /**
+   * 临时变量用于判断当前redis key数据结构是否能发生改变
+   */
+  private var currentDataType: RedisDataType = _
 
   private var contentPaneController: AbstractRedisContentService[_ <: Node] = _
 
@@ -86,17 +90,19 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
       val ttl = Await.result[Long](client.ttl(valTab.redisKey, valTab.index), Duration.Inf)
       val dataType = Await.result[RedisDataType](client.typeKey(valTab.redisKey, valTab.index), Duration.Inf)
-      if (this.contentPaneController != null) {
-        this.contentPaneController.contentPaneRequestClose()
+      val updated = currentDataType == null || currentDataType != dataType
+      if (updated) {
+        if (this.contentPaneController != null) {
+          this.contentPaneController.contentPaneRequestClose()
+        }
+        this.contentPaneController = if (dataType == RedisDataType.STRING) {
+          new StringContentPaneController(this)
+        } else {
+          new RichTextFormContentPaneController(this)
+        }
+        this.currentDataType = dataType
       }
-      this.contentPaneController = if (dataType == RedisDataType.STRING) {
-        new StringContentPaneController(this)
-      } else {
-        val form = new FormContentPaneController(this)
-        println(form)
-        form
-      }
-      Await.result(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType), Duration.Inf)
+      Await.result(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType, updated), Duration.Inf)
       Platform.runLater(() => {
         this.tLabel.setText(s"TTL:$ttl")
         this.innerPane.setCenter(this.contentPaneController.getParent)

@@ -14,10 +14,9 @@
     </stylesheets>
     <center>
         <TableView fx:id="tableView">
-            <columns>
-                <TableColumn text="row"/>
-                <TableColumn text="value"/>
-            </columns>
+            <placeholder>
+                <Label text="暂无数据"/>
+            </placeholder>
         </TableView>
     </center>
     <right>
@@ -28,8 +27,8 @@
                 <Button text="重载值" HBox.hgrow="ALWAYS"/>
             </VBox>
             <VBox>
-                <HBox styleClass="page-container">
-                    <Button>
+                <HBox styleClass="page-container" fx:id="pageContainer">
+                    <Button onAction="#previous">
                         <tooltip>
                             <Tooltip text="上一页"/>
                         </tooltip>
@@ -39,8 +38,8 @@
                             </ImageView>
                         </graphic>
                     </Button>
-                    <TextField HBox.hgrow="ALWAYS"/>
-                    <Button>
+                    <TextField HBox.hgrow="ALWAYS" editable="false" fx:id="pageIndicator" alignment="CENTER"/>
+                    <Button onAction="#next">
                         <tooltip>
                             <Tooltip text="下一页"/>
                         </tooltip>

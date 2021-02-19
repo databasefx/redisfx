@@ -75,6 +75,9 @@
     </top>
     <center>
         <TableView fx:id="tableView">
+            <placeholder>
+                <Label text="暂无连接"/>
+            </placeholder>
             <columns>
                 <TableColumn text="名称"/>
                 <TableColumn text="主机"/>

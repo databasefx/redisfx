@@ -91,7 +91,7 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
       case RedisDataType.LIST => client.lPush(keyVal, value, database)
       case RedisDataType.SET => client.sAdd(keyVal, value, database)
       case RedisDataType.Z_SET =>
-        val score = this.scoreField.getText.toInt
+        val score = this.scoreField.getText.toDouble
         client.zAdd(keyVal, value, score, database)
       case _ =>
         val ttl = this.ttlField.getText().toInt

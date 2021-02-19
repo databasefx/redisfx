@@ -64,7 +64,7 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
    * @param scope 权重值
    * @return
    */
-  def zAdd(key: String, value: String, scope: Int, database: Int): Future[Boolean] = {
+  def zAdd(key: String, value: String, scope: Double, database: Int): Future[Boolean] = {
     this.executeCommand[Boolean](jedis => jedis.zadd(key, scope, value) > 0, database)
   }
 
@@ -78,6 +78,10 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
 
   def zRange(key: String, start: Long, end: Long, database: Int): Future[Array[String]] = {
     this.executeCommand[Array[String]](jedis => jedis.zrange(key, start, end).asScala.toArray, database)
+  }
+
+  def zScore(key: String, member: String, database: Int): Future[Double] = {
+    this.executeCommand[Double](jedis => jedis.zscore(key, member), database)
   }
 
   /**
