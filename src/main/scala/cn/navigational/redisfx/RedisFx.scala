@@ -12,14 +12,6 @@ import java.util
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-object Launcher {
-  def main(args: Array[String]): Unit = {
-    Application.launch(classOf[RedisFx], args: _*)
-  }
-}
-
-
 class RedisFx extends Application with AppPlatform.AppNotificationHandler {
   private val logger: Logger = LoggerFactory.getLogger(classOf[RedisFx])
 
