@@ -62,12 +62,10 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
         map.values().forEach(arr.addOne)
         arr.toArray
       case RedisDataType.LIST =>
-        val len = Await.result[Long](client.lLen(redisKey, index), Duration.Inf)
         Await.result[Array[String]](client.lRange(redisKey, offset, end, index), Duration.Inf)
       case RedisDataType.SET =>
         Await.result[Array[String]](client.sMember(redisKey, index), Duration.Inf)
       case RedisDataType.Z_SET =>
-        val len = Await.result[Long](client.zCard(redisKey, index), Duration.Inf)
         Await.result[Array[String]](client.zRange(redisKey, offset, end, index), Duration.Inf)
     }
     val arr = new ArrayBuffer[RedisRichValueModel]()

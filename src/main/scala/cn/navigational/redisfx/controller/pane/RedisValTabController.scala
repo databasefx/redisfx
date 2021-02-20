@@ -45,7 +45,7 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
 
   @FXML
   private def deleteKey(): Unit = {
-    val confirm = NotificationHelper.showConfirmAlert(msg = "你确定要删除?")
+    val confirm = NotificationHelper.showConfirmAlert(msg = s"你确定要删除${valTab.redisKey}?")
     if (!confirm) {
       return
     }
