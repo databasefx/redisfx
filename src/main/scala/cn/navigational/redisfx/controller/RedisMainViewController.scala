@@ -3,7 +3,7 @@ package cn.navigational.redisfx.controller
 import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisMainViewController.redisConnectList
-import cn.navigational.redisfx.enums.TableMenAction
+import cn.navigational.redisfx.enums.{MainTableColumn, TableMenAction}
 import cn.navigational.redisfx.helper.{JedisHelper, NotificationHelper}
 import cn.navigational.redisfx.io.RedisFxIO
 import cn.navigational.redisfx.model.RedisConnectInfo
@@ -13,7 +13,7 @@ import javafx.collections.{FXCollections, ListChangeListener, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.Node
-import javafx.scene.control.{ContextMenu, MenuItem, TableView}
+import javafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{AnchorPane, BorderPane}
@@ -48,25 +48,10 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
   }
 
   {
-    this.getStage.initStyle(StageStyle.UNDECORATED)
-    this.getStage.show()
-    RedisMainViewController.redisConnectList.addListener(this.perRedisConfigListener)
-    val columns = this.tableView.getColumns
-    var index = 0
-    columns.forEach(column => {
-      var field = ""
-      if (index == 0) {
-        field = "name";
-      } else if (index == 1) {
-        field = "host"
-      } else if (index == 2) {
-        field = "localSave"
-      } else {
-        field = "lastUseDate"
-      }
-      column.prefWidthProperty().bind(tableView.widthProperty().multiply(0.248))
-      column.setCellValueFactory(new PropertyValueFactory(field))
-      index += 1
+    MainTableColumn.values().foreach(it => {
+      val tableColumn = new TableColumn[RedisConnectInfo, Object](it.getName)
+      tableColumn.setCellValueFactory(new PropertyValueFactory(it.getMapper))
+      tableView.getColumns.add(tableColumn)
     })
     val cMenu = new ContextMenu()
     TableMenAction.values().foreach(it => {
@@ -77,7 +62,11 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
       cMenu.getItems.add(item)
     })
     this.tableView.setContextMenu(cMenu)
+    this.tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY)
+    RedisMainViewController.redisConnectList.addListener(this.perRedisConfigListener)
     this.loadPerConfigFromDisk()
+    this.getStage.initStyle(StageStyle.UNDECORATED)
+    this.getStage.show()
   }
 
   @FXML

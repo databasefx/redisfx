@@ -35,6 +35,10 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
    */
   private val pageSize: Int = 10
 
+  {
+    this.tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY)
+  }
+
   /**
    * 执行更新操作
    *

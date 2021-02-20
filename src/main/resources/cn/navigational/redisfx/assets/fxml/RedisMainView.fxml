@@ -78,12 +78,6 @@
             <placeholder>
                 <Label text="暂无连接"/>
             </placeholder>
-            <columns>
-                <TableColumn text="名称"/>
-                <TableColumn text="主机"/>
-                <TableColumn text="本地保存"/>
-                <TableColumn text="最后使用时间"/>
-            </columns>
         </TableView>
     </center>
 </BorderPane>

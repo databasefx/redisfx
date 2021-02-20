@@ -1,3 +1,7 @@
+.table-view .nested-column-header {
+    -fx-min-width: 10em;
+}
+
 .right-box {
     -fx-padding: 0.5em;
     -fx-pref-width: 22em;
