@@ -6,17 +6,14 @@ import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisValTab
 import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.helper.NotificationHelper
-import cn.navigational.redisfx.model.RedisContent
-import cn.navigational.redisfx.model.impl.BasicRedisContent
-import cn.navigational.redisfx.util.{JSONUtil, RedisDataUtil}
+import cn.navigational.redisfx.util.AsyncUtil
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.Node
 import javafx.scene.control.{Label, TextField}
-import javafx.scene.layout.{BorderPane, Pane, Region}
+import javafx.scene.layout.BorderPane
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
@@ -72,7 +69,7 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     val future = client.setTtl(valTab.redisKey, ttl, valTab.index)
     future.onComplete({
       case Success(value) => Platform.runLater(() => {
-        this.tLabel.setText(ttl.toString)
+        this.tLabel.setText(s"TTL:${ttl.toString}")
         promise.success(value)
       })
       case Failure(ex) => promise.failure(ex)
@@ -88,8 +85,8 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     val promise = showLoad[Unit]()
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
-      val ttl = Await.result[Long](client.ttl(valTab.redisKey, valTab.index), Duration.Inf)
-      val dataType = Await.result[RedisDataType](client.typeKey(valTab.redisKey, valTab.index), Duration.Inf)
+      val ttl = AsyncUtil.awaitWithInf(client.ttl(valTab.redisKey, valTab.index))
+      val dataType = AsyncUtil.awaitWithInf(client.typeKey(valTab.redisKey, valTab.index))
       val updated = currentDataType == null || currentDataType != dataType
       if (updated) {
         if (this.contentPaneController != null) {
@@ -102,7 +99,7 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
         }
         this.currentDataType = dataType
       }
-      Await.result(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType, updated), Duration.Inf)
+      AsyncUtil.awaitWithInf(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType, updated))
       Platform.runLater(() => {
         this.tLabel.setText(s"TTL:$ttl")
         this.innerPane.setCenter(this.contentPaneController.getParent)

@@ -2,7 +2,7 @@ package cn.navigational.redisfx.io
 
 import cn.navigational.redisfx.AppPlatform
 import cn.navigational.redisfx.model.RedisConnectInfo
-import cn.navigational.redisfx.util.{AESUtil, JSONUtil, StringUtil}
+import cn.navigational.redisfx.util.{AESUtil, AsyncUtil, JSONUtil, StringUtil}
 import com.alibaba.fastjson.JSONArray
 
 import java.io.File
@@ -10,7 +10,7 @@ import java.nio.file.{Files, Path}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 object RedisFxIO {
   /**
@@ -28,9 +28,9 @@ object RedisFxIO {
    * @return 异步句柄
    */
   def saveConnectInfo(info: RedisConnectInfo): Future[Unit] = Future {
-    val arr = Await.result(getConnectFile, Duration.Inf)
+    val arr = AsyncUtil.awaitWithInf(getConnectFile)
     val nArr = arr :+ info
-    Await.result[Boolean](this.saveConnectFile(nArr), Duration.Inf)
+    AsyncUtil.awaitWithInf(this.saveConnectFile(nArr))
   }
 
   /**

@@ -5,10 +5,11 @@ import cn.navigational.redisfx.controller.RedisFxPaneController
 import cn.navigational.redisfx.controls.RedisKeyTreeItem.KEY_ICON
 import cn.navigational.redisfx.helper.NotificationHelper
 import cn.navigational.redisfx.model.RedisKey
+import cn.navigational.redisfx.util.AsyncUtil
 import javafx.scene.image.{Image, ImageView}
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 
 object RedisKeyTreeItem {
@@ -33,7 +34,7 @@ class RedisKeyTreeItem(private val redisKey: RedisKey) extends RedisFxTreeItem {
     }
     this._refresh[Boolean](() => {
       val client = RedisFxPaneController.getRedisClient(uuid)
-      Await.result[Long](client.del(getRowKey, index), Duration.Inf) > 0
+      AsyncUtil.awaitWithInf(client.del(getRowKey, index)) > 0
     })
   }
 

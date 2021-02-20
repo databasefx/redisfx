@@ -3,7 +3,7 @@ package cn.navigational.redisfx.controller.pane
 import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.{AddRedisKeyController, RedisFxPaneController}
-import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFolderItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
+import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{TabPane, TreeItem, TreeView}

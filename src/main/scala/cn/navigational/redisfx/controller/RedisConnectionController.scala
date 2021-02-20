@@ -1,11 +1,10 @@
 package cn.navigational.redisfx.controller
 
-import cn.navigational.redisfx.{AbstractDialogFXMLDialog, AbstractViewController}
+import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
-import cn.navigational.redisfx.helper.{AssetHelper, JedisHelper, NotificationHelper}
+import cn.navigational.redisfx.helper.{JedisHelper, NotificationHelper}
 import cn.navigational.redisfx.io.RedisFxIO
 import cn.navigational.redisfx.model.RedisConnectInfo
-import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.control.{PasswordField, TextField}

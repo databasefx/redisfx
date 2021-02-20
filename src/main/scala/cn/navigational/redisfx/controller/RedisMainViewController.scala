@@ -4,11 +4,10 @@ import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.RedisMainViewController.redisConnectList
 import cn.navigational.redisfx.enums.{MainTableColumn, TableMenAction}
-import cn.navigational.redisfx.helper.{JedisHelper, NotificationHelper}
+import cn.navigational.redisfx.helper.NotificationHelper
 import cn.navigational.redisfx.io.RedisFxIO
 import cn.navigational.redisfx.model.RedisConnectInfo
-import cn.navigational.redisfx.util.DateUtil
-import javafx.application.Platform
+import cn.navigational.redisfx.util.{AsyncUtil, DateUtil}
 import javafx.collections.{FXCollections, ListChangeListener, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -19,8 +18,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{AnchorPane, BorderPane}
 import javafx.stage.{Stage, StageStyle, WindowEvent}
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object RedisMainViewController {
@@ -134,7 +132,7 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
   }
 
   private def loadPerConfigFromDisk(): Unit = {
-    val arr = Await.result(RedisFxIO.getConnectFile, Duration.Inf)
+    val arr = AsyncUtil.awaitWithInf(RedisFxIO.getConnectFile)
     for (element <- arr) {
       redisConnectList.add(element)
     }

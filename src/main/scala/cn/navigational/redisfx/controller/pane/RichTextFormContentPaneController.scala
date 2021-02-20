@@ -4,7 +4,7 @@ import cn.navigational.redisfx.AbstractRedisContentService
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.enums.{RedisDataType, RichTextTableColumn}
 import cn.navigational.redisfx.model.RedisRichValueModel
-import cn.navigational.redisfx.util.JedisUtil
+import cn.navigational.redisfx.util.{AsyncUtil, JedisUtil}
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.cell.PropertyValueFactory
@@ -13,9 +13,8 @@ import javafx.scene.layout.{BorderPane, HBox}
 
 import java.util
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.{BufferHasAsJava, CollectionHasAsScala}
 import scala.util.Failure
 
@@ -56,17 +55,17 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
     val end = offset + pageSize
     val list = dataType match {
       case RedisDataType.HASH =>
-        val map = Await.result[java.util.Map[String, String]](client.hGet(redisKey, index), Duration.Inf)
+        val map = AsyncUtil.awaitWithInf(client.hGet(redisKey, index))
         val arr = new ArrayBuffer[String]()
         map.keySet().forEach(arr.addOne)
         map.values().forEach(arr.addOne)
         arr.toArray
       case RedisDataType.LIST =>
-        Await.result[Array[String]](client.lRange(redisKey, offset, end, index), Duration.Inf)
+        AsyncUtil.awaitWithInf(client.lRange(redisKey, offset, end, index))
       case RedisDataType.SET =>
-        Await.result[Array[String]](client.sMember(redisKey, index), Duration.Inf)
+        AsyncUtil.awaitWithInf(client.sMember(redisKey, index))
       case RedisDataType.Z_SET =>
-        Await.result[Array[String]](client.zRange(redisKey, offset, end, index), Duration.Inf)
+        AsyncUtil.awaitWithInf(client.zRange(redisKey, offset, end, index))
     }
     val arr = new ArrayBuffer[RedisRichValueModel]()
     if (dataType == RedisDataType.HASH) {
@@ -84,7 +83,7 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
       for (elem <- list) {
         val model = new RedisRichValueModel()
         if (dataType == RedisDataType.Z_SET) {
-          val score = Await.result[Double](client.zScore(redisKey, elem, index), Duration.Inf)
+          val score = AsyncUtil.awaitWithInf(client.zScore(redisKey, elem, index))
           model.setScore(score)
         }
         model.setIndex(i)

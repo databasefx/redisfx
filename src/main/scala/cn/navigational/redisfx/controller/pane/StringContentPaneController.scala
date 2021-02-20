@@ -3,7 +3,7 @@ package cn.navigational.redisfx.controller.pane
 import cn.navigational.redisfx.AbstractRedisContentService
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.enums.{RedisDataType, RedisDataViewFormat}
-import cn.navigational.redisfx.util.{JedisUtil, RedisDataUtil}
+import cn.navigational.redisfx.util.{AsyncUtil, JedisUtil, RedisDataUtil}
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
@@ -13,7 +13,7 @@ import javafx.scene.layout.BorderPane
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.nio.charset.Charset
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class StringContentPaneController(valTabController: RedisValTabController) extends AbstractRedisContentService[BorderPane](valTabController, RedisFxResource.load("fxml/pane/StringContentPane.fxml")) {
   @FXML
@@ -49,7 +49,7 @@ class StringContentPaneController(valTabController: RedisValTabController) exten
    * @return
    */
   override def onContentUpdate(client: JedisUtil, redisKey: String, index: Int, dataType: RedisDataType,update: Boolean): Future[Unit] = Future {
-    val data = Await.result[String](client.get(redisKey, index), Duration.Inf)
+    val data = AsyncUtil.awaitWithInf(client.get(redisKey, index))
     val size = data.getBytes(Charset.forName("UTF8")).length
     //如果未指定数据格式=>自动判断
     if (viewFormat == null) {
