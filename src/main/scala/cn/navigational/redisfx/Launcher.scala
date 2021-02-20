@@ -36,7 +36,7 @@ class RedisFx extends Application with AppPlatform.AppNotificationHandler {
         Platform.exit()
         return
       }
-      new RedisMainViewController().openWindow()
+      RedisMainViewController.openMainView()
     } catch {
       case x: IOException => x.printStackTrace()
     }

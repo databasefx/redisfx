@@ -9,6 +9,16 @@
     <stylesheets>
         <URL value="@../css/RedisFxPaneViewStyle.css"/>
     </stylesheets>
+    <top>
+        <MenuBar>
+            <Menu text="文件">
+                <MenuItem text="连接列表" onAction="#openMainWindow"/>
+            </Menu>
+            <Menu text="帮助">
+                <MenuItem text="关于" onAction="#openAboutWindow"/>
+            </Menu>
+        </MenuBar>
+    </top>
     <center>
         <TabPane fx:id="tabPane" styleClass="main-tab-pane"/>
     </center>

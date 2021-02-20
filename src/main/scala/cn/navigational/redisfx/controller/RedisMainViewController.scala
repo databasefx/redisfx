@@ -24,7 +24,20 @@ import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object RedisMainViewController {
+  private var mainViewController: RedisMainViewController = _
   val redisConnectList: ObservableList[RedisConnectInfo] = FXCollections.observableArrayList()
+
+  /**
+   * 打开连接窗口并做一系列初始化操作
+   */
+  def openMainView(): Unit = {
+    if (mainViewController == null) {
+      mainViewController = new RedisMainViewController()
+      redisConnectList.addListener(mainViewController.perRedisConfigListener)
+      mainViewController.loadPerConfigFromDisk()
+    }
+    mainViewController.openWindow()
+  }
 }
 
 class RedisMainViewController extends AbstractViewController[BorderPane]("RedisFX Desktop Client", RedisFxResource.load("fxml/RedisMainView.fxml")) {
@@ -63,15 +76,16 @@ class RedisMainViewController extends AbstractViewController[BorderPane]("RedisF
     })
     this.tableView.setContextMenu(cMenu)
     this.tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY)
-    RedisMainViewController.redisConnectList.addListener(this.perRedisConfigListener)
-    this.loadPerConfigFromDisk()
     this.getStage.initStyle(StageStyle.UNDECORATED)
     this.getStage.show()
   }
 
   @FXML
-  def exit(event: ActionEvent): Unit = {
-    Platform.exit()
+  def exit(): Unit = {
+    this.close()
+    //释放资源
+    RedisMainViewController.mainViewController = null
+    RedisMainViewController.redisConnectList.removeListener(this.perRedisConfigListener)
   }
 
   @FXML

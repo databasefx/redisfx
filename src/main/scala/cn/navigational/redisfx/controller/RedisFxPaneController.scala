@@ -85,6 +85,16 @@ class RedisFxPaneController extends AbstractViewController[BorderPane]("RedisFX"
     }
   }
 
+  @FXML
+  def openAboutWindow(): Unit = {
+    new RedisFxAboutController()
+  }
+
+  @FXML
+  def openMainWindow(): Unit = {
+    RedisMainViewController.openMainView()
+  }
+
   override def onWindowRequestClose(event: WindowEvent): Unit = {
     val confirm = NotificationHelper.showConfirmAlert(msg = "你确定要关闭当前窗口?")
     if (!confirm) {
