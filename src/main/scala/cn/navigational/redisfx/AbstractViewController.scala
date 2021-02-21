@@ -54,13 +54,17 @@ class AbstractViewController[P <: Parent](fxmlUrl: URL) extends AbstractFXMLCont
   /**
    * 打开窗口
    */
-  def openWindow(): Unit = {
+  def openWindow(await: Boolean = false): Unit = {
     val stage = getStage
     Platform.runLater(() => {
       if (stage.isShowing) {
         stage.toFront()
       } else {
-        stage.show()
+        if (await) {
+          stage.showAndWait()
+        } else {
+          stage.show()
+        }
       }
     })
   }

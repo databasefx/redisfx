@@ -22,7 +22,7 @@
     <right>
         <VBox styleClass="right-box">
             <VBox VBox.vgrow="ALWAYS" styleClass="action-list">
-                <Button text="新增一行" HBox.hgrow="ALWAYS"/>
+                <Button text="新增一行" HBox.hgrow="ALWAYS" onAction="#addRow"/>
                 <Button text="删除一行" HBox.hgrow="ALWAYS"/>
                 <Button text="重载值" HBox.hgrow="ALWAYS"/>
             </VBox>

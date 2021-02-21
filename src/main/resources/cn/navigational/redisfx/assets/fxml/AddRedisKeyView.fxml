@@ -26,6 +26,5 @@
     </VBox>
     <HBox GridPane.rowIndex="12" styleClass="bottom-box">
         <Button text="保存" onAction="#createRedisKey"/>
-        <Button text="取消"/>
     </HBox>
 </GridPane>

@@ -4,6 +4,7 @@ import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.{AddRedisKeyController, RedisFxPaneController}
 import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
+import cn.navigational.redisfx.model.AddRedisKeyMetaModel
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{TabPane, TreeItem, TreeView}
@@ -30,11 +31,14 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
         selectItem match {
           case rk: RedisKeyTreeItem =>
             if (rk.isLeaf) {
+              val index = rk.index
               val key = rk.getRowKey
               val optional = tabPane.getTabs
-                .stream().filter(it => it.asInstanceOf[RedisValTab].redisKey == key).findAny()
+                .stream()
+                .filter(it => it.asInstanceOf[RedisValTab].sameTab(key, index))
+                .findAny()
               val tab = if (optional.isEmpty) {
-                val tab = new RedisValTab(key, uuid, rk.index) {
+                val tab = new RedisValTab(key, uuid, index) {
                   this.treeItem = selectItem
                   this.clientTabPaneController = RedisClientTabPaneController.this
                 }
@@ -79,7 +83,30 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
 
   @FXML
   def addRedisKey(): Unit = {
-    new AddRedisKeyController(this)
+    val option = currentTreeItem()
+    val controller = if (option.isEmpty) {
+      new AddRedisKeyController(uuid)
+    } else {
+      val item = option.get
+      val meta = new AddRedisKeyMetaModel()
+      val index = if (item.isInstanceOf[RedisDatabaseItem]) {
+        item.getParent.getChildren.indexOf(item)
+      } else {
+        var index = -1
+        var parent = item.getParent
+        while (index < 0) {
+          if (parent.isInstanceOf[RedisDatabaseItem]) {
+            index = parent.getParent.getChildren.indexOf(parent)
+          } else {
+            parent = parent.getParent
+          }
+        }
+        index
+      }
+      meta.setIndex(index)
+      new AddRedisKeyController(uuid, meta, () => {})
+    }
+    controller.openWindow(true)
   }
 
   /**

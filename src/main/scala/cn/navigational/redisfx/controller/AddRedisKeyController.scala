@@ -4,6 +4,7 @@ import cn.navigational.redisfx.AbstractViewController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.pane.RedisClientTabPaneController
 import cn.navigational.redisfx.enums.RedisDataType
+import cn.navigational.redisfx.model.AddRedisKeyMetaModel
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
@@ -22,7 +23,7 @@ import scala.util.{Failure, Success}
  * @author yangkui
  * @since 1.0
  */
-class AddRedisKeyController(private val ownerController: RedisClientTabPaneController) extends AbstractViewController[GridPane]("新建KEY", RedisFxResource.load("fxml/AddRedisKeyView.fxml")) {
+class AddRedisKeyController(private val uuid: String) extends AbstractViewController[GridPane]("新建KEY", RedisFxResource.load("fxml/AddRedisKeyView.fxml")) {
   @FXML
   private var contentBox: VBox = _
   @FXML
@@ -65,7 +66,15 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
     //初始化选中字符串
     this.typeChoiceBox.getSelectionModel.select(RedisDataType.STRING.getName)
     this.typeChoiceBox.getSelectionModel.selectedItemProperty().addListener(this.selectListener)
-    this.getStage.showAndWait()
+  }
+
+  private var callback: () => Unit = _
+  private var redisKeyMetaModel: AddRedisKeyMetaModel = _
+
+  def this(uuid: String, redisKeyMetaModel: AddRedisKeyMetaModel, callback: () => Unit) {
+    this(uuid)
+    this.callback = callback
+    this.redisKeyMetaModel = redisKeyMetaModel
   }
 
   override def onWindowRequestClose(event: WindowEvent): Unit = {
@@ -79,7 +88,7 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
     val keyVal = this.keyField.getText()
     val value = this.regularField.getText()
     val database = this.dbBox.getSelectionModel.getSelectedIndex
-    val client = RedisFxPaneController.getRedisClient(ownerController.uuid)
+    val client = RedisFxPaneController.getRedisClient(this.uuid)
     val promise = this.showLoad[Boolean]("设置中...")
     val future = dataType match {
       case RedisDataType.HASH =>
@@ -98,14 +107,31 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
         client.setEx(keyVal, value, database, ttl)
     }
     future onComplete {
-      case Success(value) => promise.success(value)
+      case Success(value) =>
         this.close()
+        promise.success(value)
+        if (this.callback != null) {
+          callback.apply()
+        }
       case Failure(ex) => promise.failure(ex)
     }
   }
 
+  private def updateValue(arr: util.ArrayList[String]): Unit = {
+    this.dbBox.getItems.addAll(arr)
+    if (redisKeyMetaModel != null) {
+      this.keyField.setText(this.redisKeyMetaModel.getKey)
+      this.dbBox.getSelectionModel.select(this.redisKeyMetaModel.getIndex)
+      this.typeChoiceBox.getSelectionModel.select(this.redisKeyMetaModel.getDataType.getName)
+    } else {
+      if (dbBox.getSelectionModel.getSelectedItem == null) {
+        this.dbBox.getSelectionModel.select(0)
+      }
+    }
+  }
+
   private def initDatabase(): Unit = {
-    val client = RedisFxPaneController.getRedisClient(ownerController.uuid)
+    val client = RedisFxPaneController.getRedisClient(this.uuid)
     val future = client.listDbCount()
     val promise = this.showLoad[Int]("初始化数据库中..")
     future onComplete {
@@ -115,10 +141,7 @@ class AddRedisKeyController(private val ownerController: RedisClientTabPaneContr
         for (index <- 0 until value) {
           arr.add(s"数据库:$index")
         }
-        Platform.runLater(() => {
-          this.dbBox.getItems.addAll(arr)
-          this.dbBox.getSelectionModel.select(0)
-        })
+        Platform.runLater(() => this.updateValue(arr))
       case Failure(ex) => promise.failure(ex)
     }
   }

@@ -2,6 +2,7 @@ package cn.navigational.redisfx.controller.pane
 
 import cn.navigational.redisfx.AbstractRedisContentService
 import cn.navigational.redisfx.assets.RedisFxResource
+import cn.navigational.redisfx.controller.AddRedisKeyController
 import cn.navigational.redisfx.enums.{RedisDataType, RichTextTableColumn}
 import cn.navigational.redisfx.model.RedisRichValueModel
 import cn.navigational.redisfx.util.{AsyncUtil, JedisUtil}
@@ -142,6 +143,11 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
       case _ =>
       case Failure(ex) => pageIndex += 1
     }
+  }
+
+  @FXML
+  def addRow(): Unit = {
+    valTabController.addRichTextRow()
   }
 }
 

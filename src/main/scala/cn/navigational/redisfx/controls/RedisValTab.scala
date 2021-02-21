@@ -29,4 +29,15 @@ class RedisValTab(val redisKey: String, val uuid: String, val index: Int) extend
     })
     updated > 0
   }
+
+  /**
+   * 判断两个Tab是否对应同一个Redis key
+   *
+   * @param key   目标Redis Key
+   * @param index 目标数据库
+   * @return 如果是对应同一个Redis key则返回{@code true},否则返回{@code false}
+   */
+  def sameTab(key: String, index: Int): Boolean = {
+    key == redisKey && index == this.index
+  }
 }

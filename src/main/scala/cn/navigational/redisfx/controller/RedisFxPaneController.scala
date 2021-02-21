@@ -16,7 +16,6 @@ import javafx.stage.WindowEvent
 
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 import scala.util.control.Breaks.break
