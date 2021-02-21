@@ -52,6 +52,7 @@ class RedisConnectionController extends AbstractViewController[GridPane]("新建
     if (localSave) {
       RedisFxIO.saveConnectInfo(info)
     }
+
     RedisMainViewController.redisConnectList.add(info)
     this.close()
   }
