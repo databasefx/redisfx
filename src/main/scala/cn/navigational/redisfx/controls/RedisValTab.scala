@@ -20,9 +20,12 @@ class RedisValTab(val redisKey: String, val uuid: String, val index: Int) extend
     this.setContent(controller.getParent)
   }
 
-  def deleteKey(): Future[Boolean] = Future {
-    val client = RedisFxPaneController.getRedisClient(uuid)
-    val updated = AsyncUtil.awaitWithInf(client.del(redisKey, index))
+  def deleteKey(delCommand: Boolean = true): Future[Boolean] = Future {
+    var updated = 1L
+    if (delCommand) {
+      val client = RedisFxPaneController.getRedisClient(uuid)
+      updated = AsyncUtil.awaitWithInf(client.del(redisKey, index))
+    }
     if (updated > 0) Platform.runLater(() => {
       this.getTabPane.getTabs.remove(this)
       this.clientTabPaneController.delTreeItem(treeItem)

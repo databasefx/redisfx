@@ -6,7 +6,7 @@ import cn.navigational.redisfx.controller.{AddRedisKeyController, RedisFxPaneCon
 import cn.navigational.redisfx.controls.RedisValTab
 import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.helper.NotificationHelper
-import cn.navigational.redisfx.model.AddRedisKeyMetaModel
+import cn.navigational.redisfx.model.{AddRedisKeyMetaModel, RedisRichValueModel}
 import cn.navigational.redisfx.util.AsyncUtil
 import javafx.application.Platform
 import javafx.fxml.FXML
@@ -91,24 +91,29 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     val promise = showLoad[Unit]()
     try {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
-      this.ttl = AsyncUtil.awaitWithInf(client.ttl(valTab.redisKey, valTab.index))
-      val dataType = AsyncUtil.awaitWithInf(client.typeKey(valTab.redisKey, valTab.index))
-      val updated = currentDataType == null || currentDataType != dataType
-      if (updated) {
-        this.onCloseRequest()
-        this.contentPaneController = if (dataType == RedisDataType.STRING) {
-          new StringContentPaneController(this)
-        } else {
-          new RichTextFormContentPaneController(this)
+      val exists = AsyncUtil.awaitWithInf(client.exists(valTab.redisKey, valTab.index))
+      if (exists) {
+        this.ttl = AsyncUtil.awaitWithInf(client.ttl(valTab.redisKey, valTab.index))
+        val dataType = AsyncUtil.awaitWithInf(client.typeKey(valTab.redisKey, valTab.index))
+        val updated = currentDataType == null || currentDataType != dataType
+        if (updated) {
+          this.onCloseRequest()
+          this.contentPaneController = if (dataType == RedisDataType.STRING) {
+            new StringContentPaneController(this)
+          } else {
+            new RichTextFormContentPaneController(this)
+          }
+          this.currentDataType = dataType
         }
-        this.currentDataType = dataType
+        AsyncUtil.awaitWithInf(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType, updated))
+        Platform.runLater(() => {
+          this.tLabel.setText(s"TTL:$ttl")
+          this.innerPane.setCenter(this.contentPaneController.getParent)
+        })
+        promise.success()
+      } else {
+        valTab.deleteKey(false)
       }
-      AsyncUtil.awaitWithInf(this.contentPaneController.onContentUpdate(client, valTab.redisKey, valTab.index, dataType, updated))
-      Platform.runLater(() => {
-        this.tLabel.setText(s"TTL:$ttl")
-        this.innerPane.setCenter(this.contentPaneController.getParent)
-      })
-      promise.success()
     } catch {
       case ex: Exception => promise.failure(ex)
     }
@@ -120,8 +125,16 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     controller.openWindow(true)
   }
 
-  def deleteRichText(): Unit = {
-
+  def deleteRichRow(member: RedisRichValueModel): Future[Long] = Future {
+    val index = valTab.index
+    val redisKey = valTab.redisKey
+    val client = RedisFxPaneController.getRedisClient(valTab.uuid)
+    AsyncUtil.awaitWithInf(this.currentDataType match {
+      case RedisDataType.SET => client.sRem(redisKey, index, member.getValue)
+      case RedisDataType.Z_SET => client.zRem(redisKey, index, member.getValue)
+      case RedisDataType.HASH => client.hDel(valTab.redisKey, index, member.getKey)
+      case RedisDataType.LIST => client.lRem(redisKey, 1, index, member.getValue)
+    })
   }
 
   /**

@@ -84,6 +84,26 @@ class JedisUtil(private val jedisPool: JedisPool, val connectInfo: RedisConnectI
     this.executeCommand[Double](jedis => jedis.zscore(key, member), database)
   }
 
+  def zRem(key: String, database: Int, members: String*): Future[Long] = {
+    this.executeCommand[Long](jedis => jedis.zrem(key, members: _*), database)
+  }
+
+  def sRem(key: String, database: Int, members: String*): Future[Long] = {
+    this.executeCommand[Long](jedis => jedis.srem(key, members: _*), database)
+  }
+
+  def lRem(key: String, count: Int, database: Int, member: String): Future[Long] = {
+    this.executeCommand[Long](jedis => jedis.lrem(key, count, member), database)
+  }
+
+  def hDel(key: String, database: Int, members: String*): Future[Long] = {
+    this.executeCommand[Long](jedis => jedis.hdel(key, members: _*), database)
+  }
+
+  def exists(key: String, database: Int): Future[Boolean] = {
+    this.executeCommand[Boolean](jedis => jedis.exists(key), database)
+  }
+
   /**
    * 获取指定key数组长度
    *

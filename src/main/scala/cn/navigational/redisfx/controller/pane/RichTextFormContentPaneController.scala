@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.jdk.CollectionConverters.{BufferHasAsJava, CollectionHasAsScala}
-import scala.util.Failure
+import scala.util.{Failure, Success}
 
 class RichTextFormContentPaneController(valTabController: RedisValTabController) extends AbstractRedisContentService[BorderPane](valTabController, RedisFxResource.load("fxml/pane/RichTextFormContentPane.fxml")) {
   @FXML
@@ -148,6 +148,23 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
   @FXML
   def addRow(): Unit = {
     valTabController.addRichTextRow()
+  }
+
+  @FXML
+  def deleteRow(): Unit = {
+    val selectItem = this.tableView.getSelectionModel.getSelectedItem
+    if (selectItem == null) {
+      return
+    }
+    val promise = this.showLoad[Unit]("删除中...", errTitle = "删除失败")
+    this.valTabController.deleteRichRow(selectItem) onComplete {
+      case Success(value) =>
+        if (value > 0) {
+          this.valTabController.initVal()
+        }
+        promise.success()
+      case Failure(ex) => promise.failure(ex)
+    }
   }
 }
 
