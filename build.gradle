@@ -26,6 +26,15 @@ javafx {
 //gluonClient {
 //    graalvmHome = '/home/yangkui/application/graalvm'
 //}
+
+//解决window乱码问题
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+tasks.withType(ScalaCompile) {
+    options.encoding = "UTF-8"
+}
+
 sourceSets {
     main {
         scala {
