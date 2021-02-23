@@ -100,14 +100,11 @@ class RedisFxPaneController extends AbstractViewController[BorderPane]("RedisFX"
       return
     }
     event.consume()
-    val promise = showLoad[Boolean]("关闭中...")
-    synCloseHandler().onComplete {
-      case Failure(ex) => promise.failure(ex)
-      case Success(value) =>
-        promise.success(value)
-        maskPaneController.hidden()
-        this.close()
-    }
+    showLoad("关闭中...", func = () => {
+      AsyncUtil.awaitWithInf(synCloseHandler())
+      maskPaneController.hidden()
+      this.close()
+    })
   }
 
   private def synCloseHandler() = Future[Boolean] {

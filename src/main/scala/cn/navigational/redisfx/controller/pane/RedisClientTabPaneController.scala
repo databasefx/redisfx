@@ -3,11 +3,12 @@ package cn.navigational.redisfx.controller.pane
 import cn.navigational.redisfx.AbstractFXMLController
 import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.{AddRedisKeyController, RedisFxPaneController}
-import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFxTreeItem, RedisKeyTreeItem, RedisValTab}
+import cn.navigational.redisfx.controls.{RedisDatabaseItem, RedisFxTreeItem, RedisFxTreeItemCell, RedisKeyTreeItem, RedisValTab}
 import cn.navigational.redisfx.model.AddRedisKeyMetaModel
+import cn.navigational.redisfx.util.AsyncUtil
 import javafx.application.Platform
 import javafx.fxml.FXML
-import javafx.scene.control.{TabPane, TreeItem, TreeView}
+import javafx.scene.control.{TabPane, TreeCell, TreeItem, TreeView}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.util
@@ -53,6 +54,7 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
         }
       }
     })
+    //    this.treeView.setCellFactory(_ => new RedisFxTreeItemCell())
   }
 
 
@@ -142,20 +144,15 @@ class RedisClientTabPaneController(val uuid: String) extends AbstractFXMLControl
   }
 
   private def loadAllDB(): Unit = {
-    val promise = showLoad[Unit]("加载DB索引中...")
     val rootNode = treeView.getRoot
-    val future: Future[Int] = RedisFxPaneController.getRedisClient(uuid).listDbCount()
-
-    future onComplete {
-      case Success(count) =>
-        promise.success(count)
-        val arr = new util.ArrayList[RedisDatabaseItem]()
-        for (i <- 0 until count) {
-          arr.add(new RedisDatabaseItem(i, uuid))
-        }
-        Platform.runLater(() => rootNode.getChildren.addAll(arr))
-      case Failure(ex) => promise.failure(ex)
-    }
+    showLoad("加载DB索引中...", func = () => {
+      val count = AsyncUtil.awaitWithInf(RedisFxPaneController.getRedisClient(uuid).listDbCount())
+      val arr = new util.ArrayList[RedisDatabaseItem]()
+      for (i <- 0 until count) {
+        arr.add(new RedisDatabaseItem(i, uuid))
+      }
+      Platform.runLater(() => rootNode.getChildren.addAll(arr))
+    })
   }
 
 }

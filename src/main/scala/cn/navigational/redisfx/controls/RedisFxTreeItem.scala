@@ -72,7 +72,6 @@ abstract class RedisFxTreeItem extends TreeItem[String] {
    * 根据传入的RedisKey创建子节点
    *
    * @param arr  RedisKey数组
-   * @param uuid 连接缓存id
    */
   protected def createChildNode(arr: Array[RedisKey]): Unit = Platform.runLater(() => {
     getChildren.clear()

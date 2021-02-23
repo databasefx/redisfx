@@ -14,7 +14,7 @@ import javafx.scene.Node
 import javafx.scene.control.{Label, TextField}
 import javafx.scene.layout.BorderPane
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
@@ -52,15 +52,10 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     if (!confirm) {
       return
     }
-    val promise = showLoad[Boolean]("删除中...", showError = false)
-    val future = valTab.deleteKey()
-    future.onComplete(ar => {
-      if (ar.isFailure) {
-        showError("删除失败", ar.failed.get)
-      } else {
-        promise.success(ar.get)
-      }
-    })
+    showLoad(
+      "删除中...",
+      errTitle = "删除失败",
+      func = () => AsyncUtil.awaitWithInf(valTab.deleteKey()))
   }
 
   @FXML
@@ -70,15 +65,10 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
       return
     }
     val ttl = optional.get().toInt
-    val promise = showLoad[Long]("更新TTL中...", "更新TTL出错")
-    val client = RedisFxPaneController.getRedisClient(valTab.uuid)
-    val future = client.setTtl(valTab.redisKey, ttl, valTab.index)
-    future.onComplete({
-      case Success(value) => Platform.runLater(() => {
-        this.tLabel.setText(s"TTL:${ttl.toString}")
-        promise.success(value)
-      })
-      case Failure(ex) => promise.failure(ex)
+    showLoad("更新TTL中...", "更新TTL出错", func = () => {
+      val client = RedisFxPaneController.getRedisClient(valTab.uuid)
+      AsyncUtil.awaitWithInf(client.setTtl(valTab.redisKey, ttl, valTab.index))
+      Platform.runLater(() => this.tLabel.setText(s"TTL:$ttl"))
     })
   }
 
@@ -87,9 +77,8 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
     this.initVal()
   }
 
-  def initVal(): Future[Unit] = Future {
-    val promise = showLoad[Unit]()
-    try {
+  def initVal(): Future[Unit] = {
+    showLoad(func = () => {
       val client = RedisFxPaneController.getRedisClient(valTab.uuid)
       val exists = AsyncUtil.awaitWithInf(client.exists(valTab.redisKey, valTab.index))
       if (exists) {
@@ -110,13 +99,10 @@ class RedisValTabController(val valTab: RedisValTab) extends AbstractFXMLControl
           this.tLabel.setText(s"TTL:$ttl")
           this.innerPane.setCenter(this.contentPaneController.getParent)
         })
-        promise.success()
       } else {
         valTab.deleteKey(false)
       }
-    } catch {
-      case ex: Exception => promise.failure(ex)
-    }
+    })
   }
 
   def addRichTextRow(): Unit = {

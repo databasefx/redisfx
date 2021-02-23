@@ -5,6 +5,7 @@ import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.controller.pane.RedisClientTabPaneController
 import cn.navigational.redisfx.enums.RedisDataType
 import cn.navigational.redisfx.model.AddRedisKeyMetaModel
+import cn.navigational.redisfx.util.AsyncUtil
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
@@ -89,32 +90,30 @@ class AddRedisKeyController(private val uuid: String) extends AbstractViewContro
     val value = this.regularField.getText()
     val database = this.dbBox.getSelectionModel.getSelectedIndex
     val client = RedisFxPaneController.getRedisClient(this.uuid)
-    val promise = this.showLoad[Boolean]("设置中...")
-    val future = dataType match {
-      case RedisDataType.HASH =>
-        val hValue = hashValue.getText()
-        val attr = new util.HashMap[String, String]() {
-          this.put(value, hValue)
-        }
-        client.hSet(keyVal, attr, database)
-      case RedisDataType.LIST => client.lPush(keyVal, value, database)
-      case RedisDataType.SET => client.sAdd(keyVal, value, database)
-      case RedisDataType.Z_SET =>
-        val score = this.scoreField.getText.toDouble
-        client.zAdd(keyVal, value, score, database)
-      case _ =>
-        val ttl = this.ttlField.getText().toInt
-        client.setEx(keyVal, value, database, ttl)
-    }
-    future onComplete {
-      case Success(value) =>
+    this.showLoad("设置中...", func = () => {
+      val rs = AsyncUtil.awaitWithInf(dataType match {
+        case RedisDataType.HASH =>
+          val hValue = hashValue.getText()
+          val attr = new util.HashMap[String, String]() {
+            this.put(value, hValue)
+          }
+          client.hSet(keyVal, attr, database)
+        case RedisDataType.LIST => client.lPush(keyVal, value, database)
+        case RedisDataType.SET => client.sAdd(keyVal, value, database)
+        case RedisDataType.Z_SET =>
+          val score = this.scoreField.getText.toDouble
+          client.zAdd(keyVal, value, score, database)
+        case _ =>
+          val ttl = this.ttlField.getText().toInt
+          client.setEx(keyVal, value, database, ttl)
+      })
+      if (rs) {
         this.close()
-        promise.success(value)
-        if (this.callback != null) {
+        if (callback != null) {
           callback.apply()
         }
-      case Failure(ex) => promise.failure(ex)
-    }
+      }
+    })
   }
 
   private def updateValue(arr: util.ArrayList[String]): Unit = {
@@ -132,17 +131,13 @@ class AddRedisKeyController(private val uuid: String) extends AbstractViewContro
 
   private def initDatabase(): Unit = {
     val client = RedisFxPaneController.getRedisClient(this.uuid)
-    val future = client.listDbCount()
-    val promise = this.showLoad[Int]("初始化数据库中..")
-    future onComplete {
-      case Success(value) =>
-        promise.success(value)
-        val arr = new util.ArrayList[String](value)
-        for (index <- 0 until value) {
-          arr.add(s"数据库:$index")
-        }
-        Platform.runLater(() => this.updateValue(arr))
-      case Failure(ex) => promise.failure(ex)
-    }
+    this.showLoad("初始化数据库中..", func = () => {
+      val value = AsyncUtil.awaitWithInf(client.listDbCount())
+      val arr = new util.ArrayList[String](value)
+      for (index <- 0 until value) {
+        arr.add(s"数据库:$index")
+      }
+      Platform.runLater(() => this.updateValue(arr))
+    })
   }
 }

@@ -5,6 +5,7 @@ import cn.navigational.redisfx.assets.RedisFxResource
 import cn.navigational.redisfx.helper.{JedisHelper, NotificationHelper}
 import cn.navigational.redisfx.io.RedisFxIO
 import cn.navigational.redisfx.model.RedisConnectInfo
+import cn.navigational.redisfx.util.AsyncUtil
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.control.{PasswordField, TextField}
@@ -63,12 +64,9 @@ class RedisConnectionController extends AbstractViewController[GridPane]("新建
     config.password = this.password.getText
     config.host = this.host.getText
     config.port = this.port.getText.toInt
-    val promise = this.showLoad[String]("连接中...", errTitle = "连接失败")
-    JedisHelper.pingRedis(config) onComplete {
-      case Success(value) =>
-        promise.success(value)
-        NotificationHelper.showInfo("连接成功", Pos.TOP_RIGHT)
-      case Failure(ex) => promise.failure(ex)
-    }
+    this.showLoad("连接中...", errTitle = "连接失败", func = () => {
+      AsyncUtil.awaitWithInf(JedisHelper.pingRedis(config))
+      NotificationHelper.showInfo("连接成功", Pos.TOP_RIGHT)
+    })
   }
 }

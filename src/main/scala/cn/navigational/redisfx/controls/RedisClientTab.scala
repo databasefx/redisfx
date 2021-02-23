@@ -17,15 +17,11 @@ class RedisClientTab(val connectInfo: RedisConnectInfo) extends Tab {
     this.setText(s"${connectInfo.getName}[${connectInfo.host}]")
     this.setOnCloseRequest(event => {
       event.consume()
-      val promise = tabPaneController.showLoad("关闭中...")
-      RedisFxPaneController.delete(UUID)
-        .onComplete({
-          case Success(_) => Platform.runLater(() => {
-            val tablePane = getTabPane
-            tablePane.getTabs.remove(this)
-          })
-          case Failure(ex) => promise.failure(ex)
-        })
+      tabPaneController.showLoad("关闭中...", func = () => {
+        RedisFxPaneController.delete(UUID)
+        val tablePane = getTabPane
+        tablePane.getTabs.remove(this)
+      })
     })
   }
 

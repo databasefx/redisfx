@@ -156,15 +156,13 @@ class RichTextFormContentPaneController(valTabController: RedisValTabController)
     if (selectItem == null) {
       return
     }
-    val promise = this.showLoad[Unit]("删除中...", errTitle = "删除失败")
-    this.valTabController.deleteRichRow(selectItem) onComplete {
-      case Success(value) =>
-        if (value > 0) {
-          this.valTabController.initVal()
-        }
-        promise.success()
-      case Failure(ex) => promise.failure(ex)
-    }
+    this.showLoad("删除中...", errTitle = "删除失败", func = () => {
+      val value = AsyncUtil.awaitWithInf(this.valTabController.deleteRichRow(selectItem))
+      if (value > 0) {
+        this.valTabController.initVal()
+      }
+    })
+
   }
 }
 
